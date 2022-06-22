@@ -20,7 +20,7 @@ void import('@fastify/swagger').then(async (sw) => {
         exposeRoute: true,
         routePrefix: '/',
         swagger: {
-            info: { title: 'schema.autobot.tf' }
+            info: { title: 'schema.autobot.tf', version: '1.0.0' }
         }
     });
 
