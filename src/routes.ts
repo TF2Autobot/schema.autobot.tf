@@ -70,6 +70,35 @@ export default async function routes(
     );
 
     app.get(
+        '/properties/killstreaks',
+        {
+            schema: {
+                description: 'Get Team Fortress 2 Item Killstreaks',
+                tags: ['Schema Properties (simplified)']
+            }
+        },
+        (req, reply) => {
+            log.info(`Got GET /properties/killstreaks request`);
+
+            return reply
+                .code(200)
+                .header('Content-Type', 'application/json; charset=utf-8')
+                .send({
+                    // https://github.com/danocmx/node-tf2-static-schema/blob/master/static/killstreaks.json
+                    None: 0,
+                    Killstreak: 1,
+                    'Specialized Killstreak': 2,
+                    'Professional Killstreak': 3,
+
+                    '0': 'None',
+                    '1': 'Killstreak',
+                    '2': 'Specialized Killstreak',
+                    '3': 'Professional Killstreak'
+                });
+        }
+    );
+
+    app.get(
         '/properties/effects',
         {
             schema: {
@@ -84,6 +113,73 @@ export default async function routes(
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
                 .send(SchemaManager.schemaManager.schema.effects);
+        }
+    );
+
+    app.get(
+        '/properties/paintkits',
+        {
+            schema: {
+                description: 'Get Team Fortress 2 Item Paintkits (War Paints)',
+                tags: ['Schema Properties (simplified)']
+            }
+        },
+        (req, reply) => {
+            log.info(`Got GET /properties/paintkits request`);
+
+            return reply
+                .code(200)
+                .header('Content-Type', 'application/json; charset=utf-8')
+                .send(SchemaManager.schemaManager.schema.paintkits);
+        }
+    );
+
+    app.get(
+        '/properties/wears',
+        {
+            schema: {
+                description: 'Get Team Fortress 2 Item Wears',
+                tags: ['Schema Properties (simplified)']
+            }
+        },
+        (req, reply) => {
+            log.info(`Got GET /properties/wears request`);
+
+            return reply
+                .code(200)
+                .header('Content-Type', 'application/json; charset=utf-8')
+                .send({
+                    // https://github.com/danocmx/node-tf2-static-schema/blob/master/static/wears.json
+                    'Factory New': 1,
+                    'Minimal Wear': 2,
+                    'Field-Tested': 3,
+                    'Well-Worn': 4,
+                    'Battle Scarred': 5,
+
+                    '1': 'Factory New',
+                    '2': 'Minimal Wear',
+                    '3': 'Field-Tested',
+                    '4': 'Well-Worn',
+                    '5': 'Battle Scarred'
+                });
+        }
+    );
+
+    app.get(
+        '/properties/crateseries',
+        {
+            schema: {
+                description: 'Get Team Fortress 2 Item Crate Series',
+                tags: ['Schema Properties (simplified)']
+            }
+        },
+        (req, reply) => {
+            log.info(`Got GET /properties/crateseries request`);
+
+            return reply
+                .code(200)
+                .header('Content-Type', 'application/json; charset=utf-8')
+                .send(SchemaManager.schemaManager.schema.crateSeriesList);
         }
     );
 
@@ -109,7 +205,8 @@ export default async function routes(
         '/properties/strangeParts',
         {
             schema: {
-                description: 'Get Team Fortress 2 Item Strange Parts',
+                description:
+                    'Get Team Fortress 2 Item Strange Parts (excluding built-in)',
                 tags: ['Schema Properties (simplified)']
             }
         },
@@ -120,42 +217,6 @@ export default async function routes(
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
                 .send(SchemaManager.schemaManager.schema.getStrangeParts());
-        }
-    );
-
-    app.get(
-        '/properties/paintkits',
-        {
-            schema: {
-                description: 'Get Team Fortress 2 Item Paintkits (War Paints)',
-                tags: ['Schema Properties (simplified)']
-            }
-        },
-        (req, reply) => {
-            log.info(`Got GET /properties/paintkits request`);
-
-            return reply
-                .code(200)
-                .header('Content-Type', 'application/json; charset=utf-8')
-                .send(SchemaManager.schemaManager.schema.paintkits);
-        }
-    );
-
-    app.get(
-        '/properties/crateseries',
-        {
-            schema: {
-                description: 'Get Team Fortress 2 Item Crate Series',
-                tags: ['Schema Properties (simplified)']
-            }
-        },
-        (req, reply) => {
-            log.info(`Got GET /properties/crateseries request`);
-
-            return reply
-                .code(200)
-                .header('Content-Type', 'application/json; charset=utf-8')
-                .send(SchemaManager.schemaManager.schema.crateSeriesList);
         }
     );
 
@@ -201,6 +262,18 @@ export default async function routes(
         }
     );
 
+    const charClass = [
+        'Scout',
+        'Soldier',
+        'Pyro',
+        'Demoman',
+        'Heavy',
+        'Engineer',
+        'Medic',
+        'Sniper',
+        'Spy'
+    ];
+
     app.get(
         '/properties/craftWeaponsByClass/:classChar',
         {
@@ -211,7 +284,8 @@ export default async function routes(
                 required: ['params'],
                 params: {
                     classChar: {
-                        type: 'string'
+                        type: 'string',
+                        enum: charClass
                     }
                 }
             }
@@ -252,17 +326,7 @@ export default async function routes(
                     .send({
                         success: false,
                         message: 'Invalid Character class.',
-                        validChar: [
-                            'Scout',
-                            'Soldier',
-                            'Pyro',
-                            'Demoman',
-                            'Heavy',
-                            'Engineer',
-                            'Medic',
-                            'Sniper',
-                            'Spy'
-                        ]
+                        validChar: charClass
                     });
             }
         }
@@ -742,4 +806,155 @@ export default async function routes(
     );
 
     // ===
+
+    app.get(
+        '/raw/schema/:key',
+        {
+            schema: {
+                description: 'Raw value for "raw.schema[key]"',
+                tags: ['Raw'],
+                required: ['params'],
+                params: {
+                    key: {
+                        type: 'string',
+                        enum: [
+                            'items_game_url',
+                            'qualities',
+                            'qualityNames',
+                            'originNames',
+                            'attributes',
+                            'item_sets',
+                            'attribute_controlled_attached_particles',
+                            'item_levels',
+                            'kill_eater_score_types',
+                            'string_lookups',
+                            'items',
+                            'paintkits'
+                        ]
+                    }
+                }
+            }
+        },
+        (req, reply) => {
+            if (req.params === undefined) {
+                return reply
+                    .code(400)
+                    .header('Content-Type', 'application/json; charset=utf-8')
+                    .send({
+                        success: false,
+                        message: 'params of key must be defined'
+                    });
+            }
+
+            // @ts-ignore
+            const key = req.params.key;
+
+            const value = SchemaManager.schemaManager.schema.raw.schema[key];
+            if (value === undefined) {
+                return reply
+                    .code(404)
+                    .header('Content-Type', 'application/json; charset=utf-8')
+                    .send({
+                        success: false,
+                        message: `Cannot find value of ${key} key in raw.schema`
+                    });
+            }
+
+            log.info(`Got GET /raw/schema/${key} request`);
+            return reply
+                .code(200)
+                .header('Content-Type', 'application/json; charset=utf-8')
+                .send({
+                    success: true,
+                    value
+                });
+        }
+    );
+
+    app.get(
+        '/raw/items_game/:key',
+        {
+            schema: {
+                description: 'Raw value for "raw.items_game[key]"',
+                tags: ['Raw'],
+                required: ['params'],
+                params: {
+                    key: {
+                        type: 'string',
+                        enum: [
+                            'game_info',
+                            'qualities',
+                            'colors',
+                            'rarities',
+                            'equip_regions_list',
+                            'equip_conflicts',
+                            'quest_objective_conditions',
+                            'item_series_types',
+                            'item_collections',
+                            'operations',
+                            'prefabs',
+                            'items',
+                            'attributes',
+                            'item_criteria_templates',
+                            'random_attribute_templates',
+                            'lootlist_job_template_definitions',
+                            'item_sets',
+                            'client_loot_lists',
+                            'revolving_loot_lists',
+                            'recipes',
+                            'achievement_rewards',
+                            'attribute_controlled_attached_particles',
+                            'armory_data',
+                            'item_levels',
+                            'kill_eater_score_types',
+                            'mvm_maps',
+                            'mvm_tours',
+                            'matchmaking_categories',
+                            'maps',
+                            'master_maps_list',
+                            'steam_packages',
+                            'string_lookups',
+                            'community_market_item_remaps',
+                            'war_definitions'
+                        ]
+                    }
+                }
+            }
+        },
+        (req, reply) => {
+            if (req.params === undefined) {
+                return reply
+                    .code(400)
+                    .header('Content-Type', 'application/json; charset=utf-8')
+                    .send({
+                        success: false,
+                        message: 'params of key must be defined'
+                    });
+            }
+
+            // @ts-ignore
+            const key = req.params.key;
+
+            const value =
+                SchemaManager.schemaManager.schema.raw.items_game[key];
+            if (value === undefined) {
+                return reply
+                    .code(404)
+                    .header('Content-Type', 'application/json; charset=utf-8')
+                    .send({
+                        success: false,
+                        message: `Cannot find value of ${key} key in raw.items_game`
+                    });
+            }
+
+            log.info(`Got GET /raw/items_game/${key} request`);
+            return reply
+                .code(200)
+                .header('Content-Type', 'application/json; charset=utf-8')
+                .send({
+                    success: true,
+                    value
+                });
+        }
+    );
 }
