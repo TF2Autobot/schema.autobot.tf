@@ -28,7 +28,7 @@ void import('@fastify/swagger').then(async (sw) => {
     try {
         await SchemaManager.init();
     } catch (err) {
-        abort(err);
+        throw err;
     }
 
     log.debug('Initiaziling routes...');
@@ -41,11 +41,36 @@ void import('@fastify/swagger').then(async (sw) => {
         await server.listen({ port });
         log.debug(`Server is up! Listening at http://localhost:${port}`);
     } catch (err) {
-        abort(err);
+        throw err;
     }
 });
 
-function abort(err): void {
-    log.error(err);
+import ON_DEATH from 'death';
+import { inspect } from 'util';
+
+ON_DEATH({ uncaughtException: true })((signalOrErr, origin) => {
+    const crashed = signalOrErr !== 'SIGINT';
+
+    if (crashed) {
+        log.error(
+            [
+                'Server' +
+                    ' crashed! Please create an issue with the following log:',
+                `package.version: ${
+                    process.env.SERVER_VERSION || undefined
+                }; node: ${process.version} ${process.platform} ${
+                    process.arch
+                }}`,
+                'Stack trace:',
+                inspect(origin)
+            ].join('\r\n')
+        );
+    } else {
+        log.warn('Received kill signal `' + signalOrErr + '`');
+    }
+
+    log.info('Server uptime:' + process.uptime());
+    clearInterval(SchemaManager?.schemaManager?._updateInterval);
+    clearTimeout(SchemaManager?.schemaManager?._updateTimeout);
     process.exit(1);
-}
+});
