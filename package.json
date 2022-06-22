@@ -1,0 +1,38 @@
+{
+    "name": "schema.autobot.tf",
+    "description": "A server that handles request related to Team Fortress 2 schema",
+    "version": "1.0.0",
+    "main": "./dist/app.js",
+    "scripts": {
+        "build": "tsc -p ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/TF2Autobot/schema.autobot.tf.git"
+    },
+    "keywords": [
+        "tf2",
+        "schema",
+        "tf2schema",
+        "tf2autobot"
+    ],
+    "author": "IdiNium",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/TF2Autobot/schema.autobot.tf/issues"
+    },
+    "homepage": "https://github.com/TF2Autobot/schema.autobot.tf#readme",
+    "dependencies": {
+        "@fastify/swagger": "^7.4.0",
+        "@tf2autobot/tf2-schema": "^2.8.3",
+        "@tf2autobot/tf2-sku": "^2.0.3",
+        "dotenv": "^16.0.1",
+        "fastify": "^4.1.0",
+        "winston": "^3.7.2",
+        "winston-daily-rotate-file": "^4.7.1"
+    },
+    "devDependencies": {
+        "@types/node": "^18.0.0",
+        "typescript": "^4.7.4"
+    }
+}
