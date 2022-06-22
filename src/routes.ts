@@ -52,15 +52,15 @@ export default async function routes(
     );
 
     app.get(
-        '/schema/qualities',
+        '/properties/qualities',
         {
             schema: {
                 description: 'Get Team Fortress 2 Item Qualities',
-                tags: ['Schema (simplified)']
+                tags: ['Schema Properties (simplified)']
             }
         },
         (req, reply) => {
-            log.info(`Got GET /schema/qualities request`);
+            log.info(`Got GET /properties/qualities request`);
 
             return reply
                 .code(200)
@@ -70,15 +70,15 @@ export default async function routes(
     );
 
     app.get(
-        '/schema/effects',
+        '/properties/effects',
         {
             schema: {
                 description: 'Get Team Fortress 2 Item Effects',
-                tags: ['Schema (simplified)']
+                tags: ['Schema Properties (simplified)']
             }
         },
         (req, reply) => {
-            log.info(`Got GET /schema/effects request`);
+            log.info(`Got GET /properties/effects request`);
 
             return reply
                 .code(200)
@@ -88,15 +88,15 @@ export default async function routes(
     );
 
     app.get(
-        '/schema/paints',
+        '/properties/paints',
         {
             schema: {
                 description: 'Get Team Fortress 2 Item Paints',
-                tags: ['Schema (simplified)']
+                tags: ['Schema Properties (simplified)']
             }
         },
         (req, reply) => {
-            log.info(`Got GET /schema/paints request`);
+            log.info(`Got GET /properties/paints request`);
 
             return reply
                 .code(200)
@@ -106,15 +106,15 @@ export default async function routes(
     );
 
     app.get(
-        '/schema/strangeParts',
+        '/properties/strangeParts',
         {
             schema: {
                 description: 'Get Team Fortress 2 Item Strange Parts',
-                tags: ['Schema (simplified)']
+                tags: ['Schema Properties (simplified)']
             }
         },
         (req, reply) => {
-            log.info(`Got GET /schema/strangeParts request`);
+            log.info(`Got GET /properties/strangeParts request`);
 
             return reply
                 .code(200)
@@ -124,15 +124,15 @@ export default async function routes(
     );
 
     app.get(
-        '/schema/paintkits',
+        '/properties/paintkits',
         {
             schema: {
                 description: 'Get Team Fortress 2 Item Paintkits (War Paints)',
-                tags: ['Schema (simplified)']
+                tags: ['Schema Properties (simplified)']
             }
         },
         (req, reply) => {
-            log.info(`Got GET /schema/paintkits request`);
+            log.info(`Got GET /properties/paintkits request`);
 
             return reply
                 .code(200)
@@ -142,15 +142,15 @@ export default async function routes(
     );
 
     app.get(
-        '/schema/crateseries',
+        '/properties/crateseries',
         {
             schema: {
                 description: 'Get Team Fortress 2 Item Crate Series',
-                tags: ['Schema (simplified)']
+                tags: ['Schema Properties (simplified)']
             }
         },
         (req, reply) => {
-            log.info(`Got GET /schema/crateseries request`);
+            log.info(`Got GET /properties/crateseries request`);
 
             return reply
                 .code(200)
@@ -160,16 +160,16 @@ export default async function routes(
     );
 
     app.get(
-        '/schema/craftWeapons',
+        '/properties/craftWeapons',
         {
             schema: {
                 description:
                     'Get an array of Team Fortress 2 Craftable Weapons (for trading)',
-                tags: ['Schema (simplified)']
+                tags: ['Schema Properties (simplified)']
             }
         },
         (req, reply) => {
-            log.info(`Got GET /schema/craftWeapons request`);
+            log.info(`Got GET /properties/craftWeapons request`);
 
             return reply
                 .code(200)
@@ -181,16 +181,16 @@ export default async function routes(
     );
 
     app.get(
-        '/schema/uncraftWeapons',
+        '/properties/uncraftWeapons',
         {
             schema: {
                 description:
                     'Get an array of Team Fortress 2 Uncraftable Weapons (for trading)',
-                tags: ['Schema (simplified)']
+                tags: ['Schema Properties (simplified)']
             }
         },
         (req, reply) => {
-            log.info(`Got GET /schema/uncraftWeapons request`);
+            log.info(`Got GET /properties/uncraftWeapons request`);
 
             return reply
                 .code(200)
@@ -202,12 +202,12 @@ export default async function routes(
     );
 
     app.get(
-        '/schema/craftWeaponsByClass/:classChar',
+        '/properties/craftWeaponsByClass/:classChar',
         {
             schema: {
                 description:
                     'Get an array of Team Fortress 2 Craftable Weapons (for trading) by Character class',
-                tags: ['Schema (simplified)'],
+                tags: ['Schema Properties (simplified)'],
                 required: ['params'],
                 params: {
                     classChar: {
@@ -232,7 +232,7 @@ export default async function routes(
             const fixCharClass =
                 params.charAt(0).toUpperCase() + params.slice(1);
             log.info(
-                `Got GET /schema/craftWeaponsByClass/${fixCharClass} request`
+                `Got GET /properties/craftWeaponsByClass/${fixCharClass} request`
             );
 
             try {
