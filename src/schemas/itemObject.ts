@@ -1,5 +1,4 @@
 export const itemObject = {
-    $id: 'itemObject',
     type: 'object',
     required: ['defindex', 'quality'],
     properties: {
