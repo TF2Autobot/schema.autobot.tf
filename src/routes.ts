@@ -296,7 +296,7 @@ export default async function routes(
                     .header('Content-Type', 'application/json; charset=utf-8')
                     .send({
                         success: false,
-                        message: 'params of Character Class must be defined'
+                        message: 'params of Character Class MUST be defined'
                     });
             }
 
@@ -361,7 +361,7 @@ export default async function routes(
                     .header('Content-Type', 'application/json; charset=utf-8')
                     .send({
                         success: false,
-                        message: 'body of item object is not defined'
+                        message: 'body of item object MUST be defined'
                     });
             }
 
@@ -392,6 +392,57 @@ export default async function routes(
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
                 .send({ success: true, name: itemName });
+        }
+    );
+
+    app.post(
+        '/getName/fromItemObjectBulk',
+        {
+            schema: {
+                description: 'Get item name from item object in bulk',
+                tags: ['Get item name'],
+                required: ['body'],
+                querystring: {
+                    type: 'object',
+                    properties: {
+                        proper: {
+                            type: 'boolean'
+                        },
+                        usePipeForSkin: {
+                            type: 'boolean'
+                        }
+                    }
+                },
+                body: {
+                    type: 'array',
+                    items: itemObject
+                }
+            }
+        },
+        (req, reply) => {
+            const itemObjects = req.body as Item[];
+            const query = req.query as {
+                proper?: boolean;
+                usePipeForSkin?: boolean;
+            };
+
+            const itemNames: string[] = [];
+            itemObjects.forEach((item) => {
+                itemNames.push(
+                    SchemaManager.schemaManager.schema.getName(
+                        item,
+                        query?.proper ?? false,
+                        query?.usePipeForSkin ?? false
+                    )
+                );
+            });
+
+            log.info(`Got GET /getName/fromItemObjectBulk request`);
+
+            return reply
+                .code(200)
+                .header('Content-Type', 'application/json; charset=utf-8')
+                .send({ success: true, itemNames });
         }
     );
 
@@ -454,12 +505,65 @@ export default async function routes(
                     });
             }
 
-            log.info(`Got GET /getName/fromSku request`);
+            log.info(`Got GET /getName/fromSku/${sku} request`);
 
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
                 .send({ success: true, name: itemName });
+        }
+    );
+
+    app.post(
+        '/getName/fromSkuBulk',
+        {
+            schema: {
+                description: 'Get item name from item sku in bulk',
+                tags: ['Get item name'],
+                required: ['body'],
+                querystring: {
+                    type: 'object',
+                    properties: {
+                        proper: {
+                            type: 'boolean'
+                        },
+                        usePipeForSkin: {
+                            type: 'boolean'
+                        }
+                    }
+                },
+                body: {
+                    type: 'array',
+                    items: {
+                        type: 'string'
+                    }
+                }
+            }
+        },
+        (req, reply) => {
+            const skus = req.body as string[];
+            const query = req.query as {
+                proper?: boolean;
+                usePipeForSkin?: boolean;
+            };
+
+            const itemNames: string[] = [];
+            skus.forEach((sku) => {
+                itemNames.push(
+                    SchemaManager.schemaManager.schema.getName(
+                        SKU.fromString(sku),
+                        query?.proper ?? false,
+                        query?.usePipeForSkin ?? false
+                    )
+                );
+            });
+
+            log.info(`Got GET /getName/fromSkuBulk request`);
+
+            return reply
+                .code(200)
+                .header('Content-Type', 'application/json; charset=utf-8')
+                .send({ success: true, itemNames });
         }
     );
 
@@ -499,12 +603,41 @@ export default async function routes(
                     });
             }
 
-            log.info(`Got GET /getSku/fromItem request`);
+            log.info(`Got GET /getSku/fromItemObject request`);
 
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
                 .send({ success: true, sku });
+        }
+    );
+
+    app.post(
+        '/getSku/fromItemObjectBulk',
+        {
+            schema: {
+                description: 'Get an item sku from item object in bulk',
+                tags: ['Get item sku'],
+                required: ['body'],
+                body: {
+                    type: 'array',
+                    items: itemObject
+                }
+            }
+        },
+        (req, reply) => {
+            const itemObjects = req.body as Item[];
+            const skus: string[] = [];
+            itemObjects.forEach((item) => {
+                skus.push(SKU.fromObject(item));
+            });
+
+            log.info(`Got GET /getSku/fromItemObjectBulk request`);
+
+            return reply
+                .code(200)
+                .header('Content-Type', 'application/json; charset=utf-8')
+                .send({ success: true, skus });
         }
     );
 
@@ -548,12 +681,45 @@ export default async function routes(
                     });
             }
 
-            log.info(`Got GET /getSku/fromName request`);
+            log.info(`Got GET /getSku/fromName/${name} request`);
 
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
                 .send({ success: true, sku });
+        }
+    );
+
+    app.post(
+        '/getSku/fromNameBulk',
+        {
+            schema: {
+                description: 'Get item sku from item full name in bulk',
+                tags: ['Get item sku'],
+                required: ['body'],
+                body: {
+                    type: 'array',
+                    items: {
+                        type: 'string'
+                    }
+                }
+            }
+        },
+        (req, reply) => {
+            const names = req.body as string[];
+            const skus: string[] = [];
+            names.forEach((name) => {
+                skus.push(
+                    SchemaManager.schemaManager.schema.getSkuFromName(name)
+                );
+            });
+
+            log.info(`Got GET /getSku/fromNameBulk request`);
+
+            return reply
+                .code(200)
+                .header('Content-Type', 'application/json; charset=utf-8')
+                .send({ success: true, skus });
         }
     );
 
@@ -563,7 +729,7 @@ export default async function routes(
         '/getItemObject/fromName/:name',
         {
             schema: {
-                description: 'Get an item instance from item full name',
+                description: 'Get an item object from item full name',
                 tags: ['Get item object'],
                 params: {
                     name: {
@@ -596,6 +762,41 @@ export default async function routes(
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
                 .send({ success: true, item });
+        }
+    );
+
+    app.post(
+        '/getItemObject/fromNameBulk',
+        {
+            schema: {
+                description: 'Get item object from item full name in bulk',
+                tags: ['Get item object'],
+                required: ['body'],
+                body: {
+                    type: 'array',
+                    items: {
+                        type: 'string'
+                    }
+                }
+            }
+        },
+        (req, reply) => {
+            const names = req.body as string[];
+            const itemObjects: Item[] = [];
+            names.forEach((name) => {
+                itemObjects.push(
+                    SchemaManager.schemaManager.schema.getItemObjectFromName(
+                        name
+                    )
+                );
+            });
+
+            log.info(`Got GET /getItemObject/fromNameBulk request`);
+
+            return reply
+                .code(200)
+                .header('Content-Type', 'application/json; charset=utf-8')
+                .send({ success: true, itemObjects });
         }
     );
 
@@ -635,6 +836,37 @@ export default async function routes(
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
                 .send({ success: true, item });
+        }
+    );
+
+    app.post(
+        '/getItemObject/fromSkuBulk',
+        {
+            schema: {
+                description: 'Get item object from item sku in bulk',
+                tags: ['Get item object'],
+                required: ['body'],
+                body: {
+                    type: 'array',
+                    items: {
+                        type: 'string'
+                    }
+                }
+            }
+        },
+        (req, reply) => {
+            const skus = req.body as string[];
+            const itemObjects: Item[] = [];
+            skus.forEach((sku) => {
+                itemObjects.push(SKU.fromString(sku));
+            });
+
+            log.info(`Got GET /getItemObject/fromSkuBulk request`);
+
+            return reply
+                .code(200)
+                .header('Content-Type', 'application/json; charset=utf-8')
+                .send({ success: true, itemObjects });
         }
     );
 
