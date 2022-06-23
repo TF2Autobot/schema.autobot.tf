@@ -19,8 +19,6 @@ export default async function routes(
             }
         },
         (req, reply) => {
-            log.info(`Got GET /schema request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -37,8 +35,6 @@ export default async function routes(
             }
         },
         (req, reply) => {
-            log.info(`Got GET /schema/download request`);
-
             return reply
                 .code(200)
                 .header(
@@ -60,8 +56,6 @@ export default async function routes(
             }
         },
         (req, reply) => {
-            log.info(`Got GET /properties/qualities request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -78,8 +72,6 @@ export default async function routes(
             }
         },
         (req, reply) => {
-            log.info(`Got GET /properties/killstreaks request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -107,8 +99,6 @@ export default async function routes(
             }
         },
         (req, reply) => {
-            log.info(`Got GET /properties/effects request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -125,8 +115,6 @@ export default async function routes(
             }
         },
         (req, reply) => {
-            log.info(`Got GET /properties/paintkits request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -143,8 +131,6 @@ export default async function routes(
             }
         },
         (req, reply) => {
-            log.info(`Got GET /properties/wears request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -174,8 +160,6 @@ export default async function routes(
             }
         },
         (req, reply) => {
-            log.info(`Got GET /properties/crateseries request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -192,8 +176,6 @@ export default async function routes(
             }
         },
         (req, reply) => {
-            log.info(`Got GET /properties/paints request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -211,8 +193,6 @@ export default async function routes(
             }
         },
         (req, reply) => {
-            log.info(`Got GET /properties/strangeParts request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -230,8 +210,6 @@ export default async function routes(
             }
         },
         (req, reply) => {
-            log.info(`Got GET /properties/craftWeapons request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -251,8 +229,6 @@ export default async function routes(
             }
         },
         (req, reply) => {
-            log.info(`Got GET /properties/uncraftWeapons request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -304,9 +280,6 @@ export default async function routes(
             const params = req.params.classChar as string;
             const fixCharClass =
                 params.charAt(0).toUpperCase() + params.slice(1);
-            log.info(
-                `Got GET /properties/craftWeaponsByClass/${fixCharClass} request`
-            );
 
             try {
                 const weapons =
@@ -386,8 +359,6 @@ export default async function routes(
                     });
             }
 
-            log.info(`Got GET /getName/fromItemObject request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -436,8 +407,6 @@ export default async function routes(
                     )
                 );
             });
-
-            log.info(`Got GET /getName/fromItemObjectBulk request`);
 
             return reply
                 .code(200)
@@ -505,8 +474,6 @@ export default async function routes(
                     });
             }
 
-            log.info(`Got GET /getName/fromSku/${sku} request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -558,8 +525,6 @@ export default async function routes(
                 );
             });
 
-            log.info(`Got GET /getName/fromSkuBulk request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -603,8 +568,6 @@ export default async function routes(
                     });
             }
 
-            log.info(`Got GET /getSku/fromItemObject request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -631,8 +594,6 @@ export default async function routes(
             itemObjects.forEach((item) => {
                 skus.push(SKU.fromObject(item));
             });
-
-            log.info(`Got GET /getSku/fromItemObjectBulk request`);
 
             return reply
                 .code(200)
@@ -681,8 +642,6 @@ export default async function routes(
                     });
             }
 
-            log.info(`Got GET /getSku/fromName/${name} request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -713,8 +672,6 @@ export default async function routes(
                     SchemaManager.schemaManager.schema.getSkuFromName(name)
                 );
             });
-
-            log.info(`Got GET /getSku/fromNameBulk request`);
 
             return reply
                 .code(200)
@@ -756,8 +713,6 @@ export default async function routes(
             const item =
                 SchemaManager.schemaManager.schema.getItemObjectFromName(name);
 
-            log.info(`Got GET /getItemObject/fromName request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -790,8 +745,6 @@ export default async function routes(
                     )
                 );
             });
-
-            log.info(`Got GET /getItemObject/fromNameBulk request`);
 
             return reply
                 .code(200)
@@ -830,8 +783,6 @@ export default async function routes(
             const sku = req.params.sku as string;
             const item = SKU.fromString(sku);
 
-            log.info(`Got GET /getItemObject/fromSku request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -860,8 +811,6 @@ export default async function routes(
             skus.forEach((sku) => {
                 itemObjects.push(SKU.fromString(sku));
             });
-
-            log.info(`Got GET /getItemObject/fromSkuBulk request`);
 
             return reply
                 .code(200)
@@ -912,8 +861,6 @@ export default async function routes(
                         message: `Unable to get item element from defindex ${defindex}`
                     });
             }
-
-            log.info(`Got GET /getItem/fromDefindex request`);
 
             return reply
                 .code(200)
@@ -982,8 +929,6 @@ export default async function routes(
                     });
             }
 
-            log.info(`Got GET /getItem/fromName request`);
-
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -1040,8 +985,6 @@ export default async function routes(
                         message: `Unable to get item element from item sku (defindex is null)`
                     });
             }
-
-            log.info(`Got GET /getItem/fromSku request`);
 
             return reply
                 .code(200)
@@ -1101,7 +1044,6 @@ export default async function routes(
                     });
             }
 
-            log.info(`Got GET /raw/schema/${key} request`);
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -1155,7 +1097,6 @@ export default async function routes(
                     });
             }
 
-            log.info(`Got GET /raw/items_game/${key} request`);
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')

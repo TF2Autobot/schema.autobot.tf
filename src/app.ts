@@ -31,6 +31,20 @@ void import('@fastify/swagger').then(async (sw) => {
         throw err;
     }
 
+    log.debug('Initiaziling hooks...');
+    // https://stackoverflow.com/questions/57645360/fastify-middleware-access-to-query-and-params
+    server.addHook('onRequest', (req, res, done) => {
+        if (
+            ['/static', '/uiConfig', '/json', '/initOAuth'].some(key => req.url.includes(key))
+        ) {
+            return done();
+        }
+
+        log.info(`Got ${req.method} ${decodeURIComponent(req.url)}`);
+
+        done();
+    });
+
     log.debug('Initiaziling routes...');
     server.register(routes);
 
@@ -47,6 +61,7 @@ void import('@fastify/swagger').then(async (sw) => {
 
 import ON_DEATH from 'death';
 import { inspect } from 'util';
+import { query } from 'winston';
 
 ON_DEATH({ uncaughtException: true })((signalOrErr, origin) => {
     const crashed = signalOrErr !== 'SIGINT';
