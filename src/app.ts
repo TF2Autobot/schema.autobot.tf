@@ -61,7 +61,6 @@ void import('@fastify/swagger').then(async (sw) => {
 
 import ON_DEATH from 'death';
 import { inspect } from 'util';
-import { query } from 'winston';
 
 ON_DEATH({ uncaughtException: true })((signalOrErr, origin) => {
     const crashed = signalOrErr !== 'SIGINT';
