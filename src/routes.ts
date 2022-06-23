@@ -281,7 +281,6 @@ export default async function routes(
                 description:
                     'Get an array of Team Fortress 2 Craftable Weapons (for trading) by Character class',
                 tags: ['Schema Properties (simplified)'],
-                required: ['params'],
                 params: {
                     classChar: {
                         type: 'string',
@@ -396,13 +395,12 @@ export default async function routes(
         }
     );
 
-    app.post(
-        '/getName/fromSku',
+    app.get(
+        '/getName/fromSku/:sku',
         {
             schema: {
                 description: 'Get an item name from item sku',
                 tags: ['Get item name'],
-                required: ['body'],
                 querystring: {
                     type: 'object',
                     properties: {
@@ -414,24 +412,28 @@ export default async function routes(
                         }
                     }
                 },
-                body: {
-                    type: 'string',
-                    examples: ['5021;6']
+                params: {
+                    sku: {
+                        type: 'string',
+                        description: `Example: "5021;6", "30769;5;u108"`
+                    }
                 }
             }
         },
         (req, reply) => {
-            if (req.body === undefined) {
+            // @ts-ignore
+            if (req.params?.sku === undefined) {
                 return reply
                     .code(400)
                     .header('Content-Type', 'application/json; charset=utf-8')
                     .send({
                         success: false,
-                        message: 'body of item sku is not defined'
+                        message: 'params of "sku" MUST be defined'
                     });
             }
 
-            const sku = req.body as string;
+            // @ts-ignore
+            const sku = req.params.sku as string;
             const query = req.query as {
                 proper?: boolean;
                 usePipeForSkin?: boolean;
@@ -506,31 +508,34 @@ export default async function routes(
         }
     );
 
-    app.post(
-        '/getSku/fromName',
+    app.get(
+        '/getSku/fromName/:name',
         {
             schema: {
                 description: 'Get an item sku from item full name',
                 tags: ['Get item sku'],
-                required: ['body'],
-                body: {
-                    type: 'string',
-                    examples: ['Mann Co. Supply Crate Key']
+                params: {
+                    name: {
+                        type: 'string',
+                        description: `Example: "Mann Co. Supply Crate Key", "Tesla Coil Herald's Helm"`
+                    }
                 }
             }
         },
         (req, reply) => {
-            if (req.body === undefined) {
+            // @ts-ignore
+            if (req.params?.name === undefined) {
                 return reply
                     .code(400)
                     .header('Content-Type', 'application/json; charset=utf-8')
                     .send({
                         success: false,
-                        message: 'body of item name is not defined'
+                        message: 'params of "name" MUST be defined'
                     });
             }
 
-            const name = req.body as string;
+            // @ts-ignore
+            const name = req.params.name as string;
             const sku = SchemaManager.schemaManager.schema.getSkuFromName(name);
 
             if (sku.includes(';null') || sku.includes(';undefined')) {
@@ -554,31 +559,34 @@ export default async function routes(
 
     // ===
 
-    app.post(
-        '/getItemObject/fromName',
+    app.get(
+        '/getItemObject/fromName/:name',
         {
             schema: {
                 description: 'Get an item instance from item full name',
                 tags: ['Get item object'],
-                required: ['body'],
-                body: {
-                    type: 'string',
-                    examples: ['Mann Co. Supply Crate Key']
+                params: {
+                    name: {
+                        type: 'string',
+                        description: `Example: "Mann Co. Supply Crate Key", "Tesla Coil Herald's Helm"`
+                    }
                 }
             }
         },
         (req, reply) => {
-            if (req.body === undefined) {
+            // @ts-ignore
+            if (req.params?.name === undefined) {
                 return reply
                     .code(400)
                     .header('Content-Type', 'application/json; charset=utf-8')
                     .send({
                         success: false,
-                        message: 'body of item name is not defined'
+                        message: 'params of "name" MUST be defined'
                     });
             }
 
-            const name = req.body as string;
+            // @ts-ignore
+            const name = req.params.name as string;
             const item =
                 SchemaManager.schemaManager.schema.getItemObjectFromName(name);
 
@@ -591,31 +599,34 @@ export default async function routes(
         }
     );
 
-    app.post(
-        '/getItemObject/fromSku',
+    app.get(
+        '/getItemObject/fromSku/:sku',
         {
             schema: {
                 description: 'Get an item object from item sku',
                 tags: ['Get item object'],
-                required: ['body'],
-                body: {
-                    type: 'string',
-                    examples: ['5021;6']
+                params: {
+                    sku: {
+                        type: 'string',
+                        description: `Example: "5021;6", "30769;5;u108"`
+                    }
                 }
             }
         },
         (req, reply) => {
-            if (req.body === undefined) {
+            // @ts-ignore
+            if (req.params?.sku === undefined) {
                 return reply
                     .code(400)
                     .header('Content-Type', 'application/json; charset=utf-8')
                     .send({
                         success: false,
-                        message: 'body of item sku is not defined'
+                        message: 'params of "sku" MUST be defined'
                     });
             }
 
-            const sku = req.body as string;
+            // @ts-ignore
+            const sku = req.params.sku as string;
             const item = SKU.fromString(sku);
 
             log.info(`Got GET /getItemObject/fromSku request`);
@@ -629,31 +640,34 @@ export default async function routes(
 
     // ===
 
-    app.post(
-        '/getItem/fromDefindex',
+    app.get(
+        '/getItem/fromDefindex/:defindex',
         {
             schema: {
                 description: 'Get an item element from item defindex',
                 tags: ['Get item element'],
-                required: ['body'],
-                body: {
-                    type: 'number',
-                    examples: [5021]
+                params: {
+                    defindex: {
+                        type: 'number',
+                        description: `Example: 5021, 30769`
+                    }
                 }
             }
         },
         (req, reply) => {
-            if (req.body === undefined) {
+            // @ts-ignore
+            if (req.params?.defindex === undefined) {
                 return reply
                     .code(400)
                     .header('Content-Type', 'application/json; charset=utf-8')
                     .send({
                         success: false,
-                        message: 'body of item defindex is not defined'
+                        message: 'params of "defindex" MUST be defined'
                     });
             }
 
-            const defindex = req.body as number;
+            // @ts-ignore
+            const defindex = parseInt(req.params.defindex) as number;
             const item =
                 SchemaManager.schemaManager.schema.getItemByDefindex(defindex);
 
@@ -683,31 +697,34 @@ export default async function routes(
         }
     );
 
-    app.post(
-        '/getItem/fromName',
+    app.get(
+        '/getItem/fromName/:name',
         {
             schema: {
                 description: 'Get an item element from item full name',
                 tags: ['Get item element'],
-                required: ['body'],
-                body: {
-                    type: 'string',
-                    examples: ['Mann Co. Supply Crate Key']
+                params: {
+                    name: {
+                        type: 'string',
+                        description: `Example: "Mann Co. Supply Crate Key", "Tesla Coil Herald's Helm"`
+                    }
                 }
             }
         },
         (req, reply) => {
-            if (req.body === undefined) {
+            // @ts-ignore
+            if (req.params?.name === undefined) {
                 return reply
                     .code(400)
                     .header('Content-Type', 'application/json; charset=utf-8')
                     .send({
                         success: false,
-                        message: 'body of item name is not defined'
+                        message: 'params of "name" MUST be defined'
                     });
             }
 
-            const name = req.body as string;
+            // @ts-ignore
+            const name = req.params.name as string;
             const itemObject =
                 SchemaManager.schemaManager.schema.getItemObjectFromName(name);
             if (itemObject.defindex === null) {
@@ -749,31 +766,34 @@ export default async function routes(
         }
     );
 
-    app.post(
-        '/getItem/fromSku',
+    app.get(
+        '/getItem/fromSku/:sku',
         {
             schema: {
                 description: 'Get an item element from item sku',
                 tags: ['Get item element'],
-                required: ['body'],
-                body: {
-                    type: 'string',
-                    examples: ['5021;6']
+                params: {
+                    sku: {
+                        type: 'string',
+                        description: `Example: "5021;6", "30769;5;u108"`
+                    }
                 }
             }
         },
         (req, reply) => {
-            if (req.body === undefined) {
+            // @ts-ignore
+            if (req.params?.sku === undefined) {
                 return reply
                     .code(400)
                     .header('Content-Type', 'application/json; charset=utf-8')
                     .send({
                         success: false,
-                        message: 'body of item sku is not defined'
+                        message: 'params of "sku" MUST be defined'
                     });
             }
 
-            const sku = req.body as string;
+            // @ts-ignore
+            const sku = req.params.sku as string;
             const itemObject = SKU.fromString(sku);
             const item = SchemaManager.schemaManager.schema.getItemByDefindex(
                 itemObject.defindex
@@ -813,7 +833,6 @@ export default async function routes(
             schema: {
                 description: 'Raw value for "raw.schema[key]"',
                 tags: ['Raw'],
-                required: ['params'],
                 params: {
                     key: {
                         type: 'string',
@@ -836,13 +855,14 @@ export default async function routes(
             }
         },
         (req, reply) => {
-            if (req.params === undefined) {
+            // @ts-ignore
+            if (req.params?.key === undefined) {
                 return reply
                     .code(400)
                     .header('Content-Type', 'application/json; charset=utf-8')
                     .send({
                         success: false,
-                        message: 'params of key must be defined'
+                        message: 'params of "key" MUST be defined'
                     });
             }
 
@@ -877,7 +897,6 @@ export default async function routes(
             schema: {
                 description: 'Raw value for "raw.items_game[key]"',
                 tags: ['Raw'],
-                required: ['params'],
                 params: {
                     key: {
                         type: 'string',
@@ -922,13 +941,14 @@ export default async function routes(
             }
         },
         (req, reply) => {
-            if (req.params === undefined) {
+            // @ts-ignore
+            if (req.params?.key === undefined) {
                 return reply
                     .code(400)
                     .header('Content-Type', 'application/json; charset=utf-8')
                     .send({
                         success: false,
-                        message: 'params of key must be defined'
+                        message: 'params of "key" MUST be defined'
                     });
             }
 
