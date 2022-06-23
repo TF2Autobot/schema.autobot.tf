@@ -1068,20 +1068,9 @@ export default async function routes(
                 params: {
                     key: {
                         type: 'string',
-                        enum: [
-                            'items_game_url',
-                            'qualities',
-                            'qualityNames',
-                            'originNames',
-                            'attributes',
-                            'item_sets',
-                            'attribute_controlled_attached_particles',
-                            'item_levels',
-                            'kill_eater_score_types',
-                            'string_lookups',
-                            'items',
-                            'paintkits'
-                        ]
+                        enum: Object.keys(
+                            SchemaManager.schemaManager.schema.raw.schema
+                        )
                     }
                 }
             }
@@ -1132,42 +1121,9 @@ export default async function routes(
                 params: {
                     key: {
                         type: 'string',
-                        enum: [
-                            'game_info',
-                            'qualities',
-                            'colors',
-                            'rarities',
-                            'equip_regions_list',
-                            'equip_conflicts',
-                            'quest_objective_conditions',
-                            'item_series_types',
-                            'item_collections',
-                            'operations',
-                            'prefabs',
-                            'items',
-                            'attributes',
-                            'item_criteria_templates',
-                            'random_attribute_templates',
-                            'lootlist_job_template_definitions',
-                            'item_sets',
-                            'client_loot_lists',
-                            'revolving_loot_lists',
-                            'recipes',
-                            'achievement_rewards',
-                            'attribute_controlled_attached_particles',
-                            'armory_data',
-                            'item_levels',
-                            'kill_eater_score_types',
-                            'mvm_maps',
-                            'mvm_tours',
-                            'matchmaking_categories',
-                            'maps',
-                            'master_maps_list',
-                            'steam_packages',
-                            'string_lookups',
-                            'community_market_item_remaps',
-                            'war_definitions'
-                        ]
+                        enum: Object.keys(
+                            SchemaManager.schemaManager.schema.raw.items_game
+                        )
                     }
                 }
             }
