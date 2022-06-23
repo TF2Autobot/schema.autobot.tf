@@ -20,7 +20,10 @@ void import('@fastify/swagger').then(async (sw) => {
         exposeRoute: true,
         routePrefix: '/',
         swagger: {
-            info: { title: 'schema.autobot.tf', version: '1.2.0' }
+            info: {
+                title: 'schema.autobot.tf',
+                version: process.env.SERVER_VERSION
+            }
         }
     });
 
@@ -35,7 +38,9 @@ void import('@fastify/swagger').then(async (sw) => {
     // https://stackoverflow.com/questions/57645360/fastify-middleware-access-to-query-and-params
     server.addHook('onRequest', (req, res, done) => {
         if (
-            ['/static', '/uiConfig', '/json', '/initOAuth'].some(key => req.url.includes(key))
+            ['/static', '/uiConfig', '/json', '/initOAuth'].some((key) =>
+                req.url.includes(key)
+            )
         ) {
             return done();
         }
