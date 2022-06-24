@@ -19,10 +19,16 @@ void import('@fastify/swagger').then(async (sw) => {
     server.register(sw, {
         exposeRoute: true,
         routePrefix: '/',
-        swagger: {
+        openapi: {
             info: {
-                title: 'schema.autobot.tf',
-                version: process.env.SERVER_VERSION
+                title: 'Team Fortress 2 Schema Public Unofficial APIs',
+                description: 'Documentation for schema.autobot.tf public APIs.',
+                version: process.env.SERVER_VERSION,
+                license: 'MIT'
+            },
+            externalDocs: {
+                url: 'https://github.com/TF2Autobot/schema.autobot.tf',
+                description: 'Github repository'
             }
         }
     });
