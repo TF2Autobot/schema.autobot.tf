@@ -10,12 +10,13 @@ import getSku from './routes/getSku/index';
 import getItemObject from './routes/getItemObject/index';
 import getItem from './routes/getItem/index';
 import raw from './routes/raw/index';
+import root from './routes/index';
 
 export default async function fastifySetup(server: FastifyInstance): Promise<void> {
     // @ts-ignore
     server.register(fastifySwagger, {
         exposeRoute: true,
-        routePrefix: '/',
+        routePrefix: '/docs',
         openapi: {
             info: {
                 title: 'Team Fortress 2 Schema Public Unofficial APIs',
@@ -49,6 +50,9 @@ export default async function fastifySetup(server: FastifyInstance): Promise<voi
     });
 
     log.debug('Initiaziling routes...');
+    server.register(root, {
+        prefix: '/'
+    });
     server.register(schema, {
         prefix: '/schema'
     });
