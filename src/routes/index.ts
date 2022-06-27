@@ -9,7 +9,7 @@ const root: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOpt
             }
         },
         (req, reply) => {
-            return reply.redirect(308, '/docs');
+            return reply.redirect(308, '/docs/static/index.html');
         }
     );
 };
