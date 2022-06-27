@@ -5,16 +5,22 @@ import genPaths from './resources/paths';
 import dotenv from 'dotenv';
 import log, { init } from './lib/logger';
 import SchemaManager from './schemaManager';
-
 import fastify from 'fastify';
-import routes from './routes';
+
+import schema from './routes/schema/index';
+import properties from './routes/properties/index';
+import getName from './routes/getName/index';
+import getSku from './routes/getSku/index';
+import getItemObject from './routes/getItemObject/index';
+import getItem from './routes/getItem/index';
+import raw from './routes/raw/index';
 
 const paths = genPaths();
 init(paths);
 dotenv.config({ path: paths.env });
 
 const server = fastify({ keepAliveTimeout: 200 });
-void import('@fastify/swagger').then(async (sw) => {
+void import('@fastify/swagger').then(async sw => {
     // @ts-ignore
     server.register(sw, {
         exposeRoute: true,
@@ -43,11 +49,7 @@ void import('@fastify/swagger').then(async (sw) => {
     log.debug('Initiaziling hooks...');
     // https://stackoverflow.com/questions/57645360/fastify-middleware-access-to-query-and-params
     server.addHook('onRequest', (req, res, done) => {
-        if (
-            ['/static', '/uiConfig', '/json', '/initOAuth'].some((key) =>
-                req.url.includes(key)
-            )
-        ) {
+        if (['/static', '/uiConfig', '/json', '/initOAuth'].some(key => req.url.includes(key))) {
             return done();
         }
 
@@ -57,7 +59,27 @@ void import('@fastify/swagger').then(async (sw) => {
     });
 
     log.debug('Initiaziling routes...');
-    server.register(routes);
+    server.register(schema, {
+        prefix: '/schema'
+    });
+    server.register(properties, {
+        prefix: '/properties'
+    });
+    server.register(getName, {
+        prefix: '/getName'
+    });
+    server.register(getSku, {
+        prefix: '/getSku'
+    });
+    server.register(getItemObject, {
+        prefix: '/getItemObject'
+    });
+    server.register(getItem, {
+        prefix: '/getItem'
+    });
+    server.register(raw, {
+        prefix: '/raw'
+    });
 
     const port = parseInt(process.env.PORT, 10);
 
@@ -79,13 +101,10 @@ ON_DEATH({ uncaughtException: true })((signalOrErr, origin) => {
     if (crashed) {
         log.error(
             [
-                'Server' +
-                    ' crashed! Please create an issue with the following log:',
-                `package.version: ${
-                    process.env.SERVER_VERSION || undefined
-                }; node: ${process.version} ${process.platform} ${
-                    process.arch
-                }}`,
+                'Server' + ' crashed! Please create an issue with the following log:',
+                `package.version: ${process.env.SERVER_VERSION || undefined}; node: ${process.version} ${
+                    process.platform
+                } ${process.arch}}`,
                 'Stack trace:',
                 inspect(origin)
             ].join('\r\n')
