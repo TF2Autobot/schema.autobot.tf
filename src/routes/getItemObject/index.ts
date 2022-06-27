@@ -44,7 +44,6 @@ const getItemObject: FastifyPluginAsync = async (app: FastifyInstance, opts?: Re
             schema: {
                 description: 'Get item object from item full name in bulk',
                 tags: ['Get item object'],
-                required: ['body'],
                 body: {
                     type: 'array',
                     items: {
@@ -115,7 +114,6 @@ const getItemObject: FastifyPluginAsync = async (app: FastifyInstance, opts?: Re
             schema: {
                 description: 'Get item object from item sku in bulk',
                 tags: ['Get item object'],
-                required: ['body'],
                 body: {
                     type: 'array',
                     items: {

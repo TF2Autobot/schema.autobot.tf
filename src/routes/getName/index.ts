@@ -10,7 +10,6 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
             schema: {
                 description: 'Get an item name from item object',
                 tags: ['Get item name'],
-                required: ['body'],
                 querystring: {
                     type: 'object',
                     properties: {
@@ -70,7 +69,6 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
             schema: {
                 description: 'Get item name from item object in bulk',
                 tags: ['Get item name'],
-                required: ['body'],
                 querystring: {
                     type: 'object',
                     properties: {
@@ -191,7 +189,6 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
             schema: {
                 description: 'Get item name from item sku in bulk',
                 tags: ['Get item name'],
-                required: ['body'],
                 querystring: {
                     type: 'object',
                     properties: {

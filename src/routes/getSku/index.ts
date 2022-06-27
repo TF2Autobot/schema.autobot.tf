@@ -10,7 +10,6 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
             schema: {
                 description: 'Get an item sku from item object',
                 tags: ['Get item sku'],
-                required: ['body'],
                 body: {
                     $ref: 'itemObject#',
                     examples: [
@@ -54,7 +53,6 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
             schema: {
                 description: 'Get an item sku from item object in bulk',
                 tags: ['Get item sku'],
-                required: ['body'],
                 body: {
                     type: 'array',
                     items: { $ref: 'itemObject#' },
@@ -135,7 +133,6 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
             schema: {
                 description: 'Get item sku from item full name in bulk',
                 tags: ['Get item sku'],
-                required: ['body'],
                 body: {
                     type: 'array',
                     items: {
