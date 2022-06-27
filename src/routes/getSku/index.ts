@@ -1,8 +1,7 @@
-import { FastifyInstance, FastifyPluginAsync, RegisterOptions } from 'fastify';
+import { FastifyInstance, FastifyPluginAsync, FastifySchema, RegisterOptions } from 'fastify';
 import SchemaManager from '../../schemaManager';
 import { Item } from '@tf2autobot/tf2-schema';
 import SKU from '@tf2autobot/tf2-sku';
-import { itemObject } from '../../schemas/itemObject';
 
 const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOptions): Promise<void> => {
     app.post(
@@ -12,7 +11,13 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
                 description: 'Get an item sku from item object',
                 tags: ['Get item sku'],
                 required: ['body'],
-                body: itemObject
+                body: {
+                    $ref: 'itemObject#',
+                    examples: [
+                        { defindex: 5021, quality: 6 },
+                        { defindex: 30769, quality: 5, effect: 108 }
+                    ]
+                }
             }
         },
         (req, reply) => {
@@ -52,7 +57,17 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
                 required: ['body'],
                 body: {
                     type: 'array',
-                    items: itemObject
+                    items: { $ref: 'itemObject#' },
+                    examples: [
+                        [
+                            { defindex: 5021, quality: 6 },
+                            { defindex: 30769, quality: 5, effect: 108 }
+                        ],
+                        [
+                            { defindex: 588, quality: 11, craftable: false },
+                            { defindex: 194, quality: 11, festive: false }
+                        ]
+                    ]
                 }
             }
         },
@@ -125,7 +140,15 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
                     type: 'array',
                     items: {
                         type: 'string'
-                    }
+                    },
+                    examples: [
+                        ['Mann Co. Supply Crate Key', "Tesla Coil Herald's Helm"],
+                        [
+                            'Strange Festivized Knife',
+                            "Vivid Plasma Connoisseur's Cap",
+                            'Sparkly Spruce Taunt: Bad Pipes'
+                        ]
+                    ]
                 }
             }
         },

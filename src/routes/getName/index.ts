@@ -2,7 +2,6 @@ import { FastifyInstance, FastifyPluginAsync, RegisterOptions } from 'fastify';
 import SchemaManager from '../../schemaManager';
 import { Item } from '@tf2autobot/tf2-schema';
 import SKU from '@tf2autobot/tf2-sku';
-import { itemObject } from '../../schemas/itemObject';
 
 const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOptions): Promise<void> => {
     app.post(
@@ -23,7 +22,13 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
                         }
                     }
                 },
-                body: itemObject
+                body: {
+                    $ref: 'itemObject#',
+                    examples: [
+                        { defindex: 5021, quality: 6 },
+                        { defindex: 30769, quality: 5, effect: 108 }
+                    ]
+                }
             }
         },
         (req, reply) => {
@@ -79,7 +84,19 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
                 },
                 body: {
                     type: 'array',
-                    items: itemObject
+                    items: {
+                        $ref: 'itemObject#'
+                    },
+                    examples: [
+                        [
+                            { defindex: 5021, quality: 6 },
+                            { defindex: 30769, quality: 5, effect: 108 }
+                        ],
+                        [
+                            { defindex: 588, quality: 11, craftable: false },
+                            { defindex: 194, quality: 11, festive: false }
+                        ]
+                    ]
                 }
             }
         },
@@ -190,7 +207,11 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
                     type: 'array',
                     items: {
                         type: 'string'
-                    }
+                    },
+                    examples: [
+                        ['5021;6', '30769;5;108'],
+                        ['321;5;u62', '183;5;u87', '30658;5;u76']
+                    ]
                 }
             }
         },

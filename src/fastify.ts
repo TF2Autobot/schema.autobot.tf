@@ -11,6 +11,7 @@ import getItemObject from './routes/getItemObject/index';
 import getItem from './routes/getItem/index';
 import raw from './routes/raw/index';
 import root from './routes/index';
+import itemObjectProperties from './schemas/itemObject';
 
 export default async function fastifySetup(server: FastifyInstance): Promise<void> {
     // @ts-ignore
@@ -49,6 +50,13 @@ export default async function fastifySetup(server: FastifyInstance): Promise<voi
         done();
     });
 
+    server.addSchema({
+        $id: 'itemObject',
+        type: 'object',
+        required: ['defindex', 'quality'],
+        properties: itemObjectProperties
+    });
+
     log.debug('Initiaziling routes...');
     server.register(root, {
         prefix: '/'
@@ -81,6 +89,8 @@ export default async function fastifySetup(server: FastifyInstance): Promise<voi
     try {
         await server.listen({ port });
         log.debug(`Server is up! Listening at http://localhost:${port}`);
+
+        server.swagger({ yaml: true });
     } catch (err) {
         throw err;
     }

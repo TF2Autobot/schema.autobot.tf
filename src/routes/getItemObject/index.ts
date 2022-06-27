@@ -49,7 +49,15 @@ const getItemObject: FastifyPluginAsync = async (app: FastifyInstance, opts?: Re
                     type: 'array',
                     items: {
                         type: 'string'
-                    }
+                    },
+                    examples: [
+                        ['Mann Co. Supply Crate Key', "Tesla Coil Herald's Helm"],
+                        [
+                            'Strange Festivized Knife',
+                            "Vivid Plasma Connoisseur's Cap",
+                            'Sparkly Spruce Taunt: Bad Pipes'
+                        ]
+                    ]
                 }
             }
         },
@@ -112,7 +120,11 @@ const getItemObject: FastifyPluginAsync = async (app: FastifyInstance, opts?: Re
                     type: 'array',
                     items: {
                         type: 'string'
-                    }
+                    },
+                    examples: [
+                        ['5021;6', '30769;5;108'],
+                        ['321;5;u62', '183;5;u87', '30658;5;u76']
+                    ]
                 }
             }
         },
