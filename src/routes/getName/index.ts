@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyPluginAsync, RegisterOptions } from 'fastify';
 import SchemaManager from '../../schemaManager';
 import { Item } from '@tf2autobot/tf2-schema';
 import SKU from '@tf2autobot/tf2-sku';
+import Redis from '../../redis';
 
 const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOptions): Promise<void> => {
     app.post(
@@ -148,21 +149,25 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
                 }
             }
         },
-        (req, reply) => {
-            // @ts-ignore
-            if (req.params?.sku === undefined) {
-                return reply.code(400).header('Content-Type', 'application/json; charset=utf-8').send({
-                    success: false,
-                    message: 'params of "sku" MUST be defined'
-                });
-            }
-
+        async (req, reply) => {
             // @ts-ignore
             const sku = req.params.sku as string;
             const query = req.query as {
                 proper?: boolean;
                 usePipeForSkin?: boolean;
             };
+
+            // gnfs - getName/FromSku
+            const itemNameCached = Redis.getCache(
+                `s_gnfs_${query.proper ? 'proper_' : ''}${query.usePipeForSkin ? 'pipe_' : ''}${sku}`
+            );
+            if (itemNameCached) {
+                return reply
+                    .code(200)
+                    .header('Content-Type', 'application/json; charset=utf-8')
+                    .send({ success: true, name: itemNameCached });
+            }
+
             const itemName = SchemaManager.schemaManager.schema.getName(
                 SKU.fromString(sku),
                 query?.proper ?? false,
@@ -175,6 +180,8 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
                     message: `Item name returned null`
                 });
             }
+
+            Redis.setCache(`s_gnfs_${query.proper ? 'proper_' : ''}${query.usePipeForSkin ? 'pipe_' : ''}${sku}`, itemName);
 
             return reply
                 .code(200)
@@ -212,7 +219,14 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
                 }
             }
         },
-        (req, reply) => {
+        async (req, reply) => {
+            if (Array.isArray(req.body) && req.body.length === 0) {
+                return reply.code(400).header('Content-Type', 'application/json; charset=utf-8').send({
+                    success: false,
+                    message: 'body MUST be an array for sku, and cannot be empty'
+                });
+            }
+
             const skus = req.body as string[];
             const query = req.query as {
                 proper?: boolean;
@@ -220,15 +234,30 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
             };
 
             const itemNames: string[] = [];
-            skus.forEach(sku => {
-                itemNames.push(
-                    SchemaManager.schemaManager.schema.getName(
+
+            for (const sku of skus) {
+                const itemNameCached = await Redis.getCache(
+                    `s_gnfs_${query.proper ? 'proper_' : ''}${query.usePipeForSkin ? 'pipe_' : ''}${sku}`
+                );
+
+                if (itemNameCached) {
+                    itemNames.push(itemNameCached);
+                } else {
+                    const itemName = SchemaManager.schemaManager.schema.getName(
                         SKU.fromString(sku),
                         query?.proper ?? false,
                         query?.usePipeForSkin ?? false
-                    )
-                );
-            });
+                    );
+                    itemNames.push(itemName);
+
+                    if (itemName !== null) {
+                        Redis.setCache(
+                            `s_gnfs_${query.proper ? 'proper_' : ''}${query.usePipeForSkin ? 'pipe_' : ''}${sku}`,
+                            itemName
+                        );
+                    }
+                }
+            }
 
             return reply
                 .code(200)

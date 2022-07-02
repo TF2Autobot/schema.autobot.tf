@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyPluginAsync, RegisterOptions } from 'fastify';
 import SchemaManager from '../../schemaManager';
 import { Item } from '@tf2autobot/tf2-schema';
 import SKU from '@tf2autobot/tf2-sku';
+import Redis from '../../redis';
 
 const getItemObject: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOptions): Promise<void> => {
     app.get(
@@ -18,7 +19,7 @@ const getItemObject: FastifyPluginAsync = async (app: FastifyInstance, opts?: Re
                 }
             }
         },
-        (req, reply) => {
+        async (req, reply) => {
             // @ts-ignore
             if (req.params?.name === undefined) {
                 return reply.code(400).header('Content-Type', 'application/json; charset=utf-8').send({
@@ -29,12 +30,30 @@ const getItemObject: FastifyPluginAsync = async (app: FastifyInstance, opts?: Re
 
             // @ts-ignore
             const name = req.params.name as string;
-            const item = SchemaManager.schemaManager.schema.getItemObjectFromName(name);
+
+            const skuCached = await Redis.getCache(`s_gsfn_${name}`);
+            let itemObject: Item;
+            if (skuCached) {
+                itemObject = SKU.fromString(skuCached);
+            } else {
+                itemObject = SchemaManager.schemaManager.schema.getItemObjectFromName(name);
+            }
+
+            if (itemObject.defindex === null || itemObject.quality === null) {
+                return reply.code(404).header('Content-Type', 'application/json; charset=utf-8').send({
+                    success: false,
+                    message: `Generated itemObject contains defindex or quality of null - Please check the item name you've sent`
+                });
+            }
+
+            if (!skuCached) {
+                Redis.setCache(`s_gsfn_${name}`, SKU.fromObject(itemObject));
+            }
 
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
-                .send({ success: true, item });
+                .send({ success: true, item: itemObject });
         }
     );
 
@@ -60,12 +79,31 @@ const getItemObject: FastifyPluginAsync = async (app: FastifyInstance, opts?: Re
                 }
             }
         },
-        (req, reply) => {
+        async (req, reply) => {
+            if (Array.isArray(req.body) && req.body.length === 0) {
+                return reply.code(400).header('Content-Type', 'application/json; charset=utf-8').send({
+                    success: false,
+                    message: 'body MUST be an array for item name, and cannot be empty'
+                });
+            }
+
             const names = req.body as string[];
             const itemObjects: Item[] = [];
-            names.forEach(name => {
-                itemObjects.push(SchemaManager.schemaManager.schema.getItemObjectFromName(name));
-            });
+
+            for (const name of names) {
+                const skuCached = await Redis.getCache(`s_gsfn_${name}`);
+
+                if (skuCached) {
+                    itemObjects.push(SKU.fromString(skuCached));
+                } else {
+                    const itemObject = SchemaManager.schemaManager.schema.getItemObjectFromName(name);
+                    itemObjects.push(itemObject);
+
+                    if (itemObject.defindex !== null && itemObject.quality !== null) {
+                        Redis.setCache(`s_gsfn_${name}`, SKU.fromObject(itemObject));
+                    }
+                }
+            }
 
             return reply
                 .code(200)

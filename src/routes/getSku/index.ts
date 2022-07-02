@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyPluginAsync, FastifySchema, RegisterOptions } f
 import SchemaManager from '../../schemaManager';
 import { Item } from '@tf2autobot/tf2-schema';
 import SKU from '@tf2autobot/tf2-sku';
+import Redis from '../../redis';
 
 const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOptions): Promise<void> => {
     app.post(
@@ -97,17 +98,19 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
                 }
             }
         },
-        (req, reply) => {
-            // @ts-ignore
-            if (req.params?.name === undefined) {
-                return reply.code(400).header('Content-Type', 'application/json; charset=utf-8').send({
-                    success: false,
-                    message: 'params of "name" MUST be defined'
-                });
-            }
-
+        async (req, reply) => {
             // @ts-ignore
             const name = req.params.name as string;
+            // gsfn - getSku/fromName
+            const skuCached = await Redis.getCache(`s_gsfn_${name}`);
+
+            if (skuCached) {
+                return reply
+                    .code(200)
+                    .header('Content-Type', 'application/json; charset=utf-8')
+                    .send({ success: true, sku: skuCached });
+            }
+
             const sku = SchemaManager.schemaManager.schema.getSkuFromName(name);
 
             if (sku.includes(';null') || sku.includes(';undefined')) {
@@ -120,6 +123,7 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
                     });
             }
 
+            Redis.setCache(`s_gsfn_${name}`, sku);
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -149,12 +153,31 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
                 }
             }
         },
-        (req, reply) => {
+        async (req, reply) => {
+            if (Array.isArray(req.body) && req.body.length === 0) {
+                return reply.code(400).header('Content-Type', 'application/json; charset=utf-8').send({
+                    success: false,
+                    message: 'body MUST be an array for item name, and cannot be empty'
+                });
+            }
+
             const names = req.body as string[];
             const skus: string[] = [];
-            names.forEach(name => {
-                skus.push(SchemaManager.schemaManager.schema.getSkuFromName(name));
-            });
+
+            for (const name of names) {
+                const skuCached = await Redis.getCache(`s_gsfn_${name}`);
+
+                if (skuCached) {
+                    skus.push(skuCached);
+                } else {
+                    const sku = SchemaManager.schemaManager.schema.getSkuFromName(name);
+                    skus.push(sku);
+
+                    if (!sku.includes(';null') && !sku.includes(';undefined')) {
+                        Redis.setCache(`s_gsfn_${name}`, sku);
+                    }
+                }
+            }
 
             return reply
                 .code(200)
