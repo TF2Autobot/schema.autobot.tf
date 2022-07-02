@@ -1,0 +1,24 @@
+{
+    "apps": [
+        {
+            "name": "schema",
+            "script": "dist/app.js",
+            "exec_mode": "fork",
+            "shutdown_with_message": false,
+            "max_memory_restart": "1500M",
+            "kill_retry_time": 30000,
+            "kill_timeout": 60000,
+            "out_file": "NULL",
+            "error_file": "NULL",
+            "env": {
+                "NODE_ENV": "production",
+
+                "STEAM_API_KEY": "",
+                "PORT": 3000,
+                "REDIS_URL": "",
+                "REDIS_USERNAME": "",
+                "REDIS_PASSWORD": ""
+            }
+        }
+    ]
+}
