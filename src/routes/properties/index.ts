@@ -4,6 +4,22 @@ import { CharacterClasses } from '@tf2autobot/tf2-schema';
 
 const properties: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOptions): Promise<void> => {
     app.get(
+        '/defindexes',
+        {
+            schema: {
+                description: 'Get Team Fortress 2 Item Defindexes',
+                tags: ['Schema Properties (simplified)']
+            }
+        },
+        (req, reply) => {
+            return reply
+                .code(200)
+                .header('Content-Type', 'application/json; charset=utf-8')
+                .send(SchemaManager.defindexes);
+        }
+    );
+
+    app.get(
         '/qualities',
         {
             schema: {
