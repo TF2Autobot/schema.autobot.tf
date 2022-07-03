@@ -41,4 +41,10 @@ export default class Redis {
     static async getCache(key: string): Promise<string> {
         return await this.client.GET(key);
     }
+
+    static async shutdown(): Promise<void> {
+        if (this.client) {
+            return await this.client.quit();
+        }
+    }
 }

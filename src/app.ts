@@ -17,8 +17,9 @@ fastifySetup(server);
 
 import ON_DEATH from 'death';
 import { inspect } from 'util';
+import Redis from './redis';
 
-ON_DEATH({ uncaughtException: true })((signalOrErr, origin) => {
+ON_DEATH({ uncaughtException: true })(async (signalOrErr, origin) => {
     const crashed = signalOrErr !== 'SIGINT';
 
     if (crashed) {
@@ -36,9 +37,14 @@ ON_DEATH({ uncaughtException: true })((signalOrErr, origin) => {
         log.warn('Received kill signal `' + signalOrErr + '`');
     }
 
-    log.info('Server uptime:' + process.uptime());
+    log.info('Server uptime: ' + process.uptime());
     clearInterval(SchemaManager?.schemaManager?._updateInterval);
     clearTimeout(SchemaManager?.schemaManager?._updateTimeout);
-    server?.close();
-    process.exit(1);
+
+    if (server) {
+        await Redis.shutdown();
+        await server.close();
+    }
+
+    process.exit(crashed ? 1 : 0);
 });
