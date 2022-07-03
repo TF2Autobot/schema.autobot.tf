@@ -38,8 +38,8 @@ export default class Redis {
         this.client.SET(key, value);
     }
 
-    static setCachex(key: string, value: string): void {
-        this.client.SETEX(key, 30 * 60 * 1000, value);
+    static setCachex(key: string, time: number, value: string): void {
+        this.client.SETEX(key, time, value);
     }
 
     static async getCache(key: string): Promise<string> {
