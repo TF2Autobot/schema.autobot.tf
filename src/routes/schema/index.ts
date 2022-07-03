@@ -37,12 +37,6 @@ const schema: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
     );
 
     const timeoutTime = 30 * 60 * 1000;
-
-    if (!Redis.getCache('s_executedRefreshSchema')) {
-        Redis.setCachex('s_executedRefreshSchema', timeoutTime, 'false');
-        Redis.setCachex('s_lastExecutedRefreshSchemaTime', timeoutTime, 'null');
-    }
-
     let lastExecutedRefreshSchemaTime = null;
     let executeRefreshSchemaTimeout: NodeJS.Timeout;
 
@@ -56,7 +50,14 @@ const schema: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
         },
         async (req, reply) => {
             const executedRefreshSchema = JSON.parse(await Redis.getCache('s_executedRefreshSchema'));
-            lastExecutedRefreshSchemaTime = JSON.parse(await Redis.getCache('s_lastExecutedRefreshSchemaTime'));
+
+            if (executedRefreshSchema === null) {
+                Redis.setCachex('s_executedRefreshSchema', timeoutTime, 'false');
+                lastExecutedRefreshSchemaTime = null;
+                Redis.setCachex('s_lastExecutedRefreshSchemaTime', timeoutTime, 'null');
+            } else {
+                lastExecutedRefreshSchemaTime = JSON.parse(await Redis.getCache('s_lastExecutedRefreshSchemaTime'));
+            }
 
             const newExecutedTime = Date.now();
             const timeDiff = newExecutedTime - lastExecutedRefreshSchemaTime;
