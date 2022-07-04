@@ -8,6 +8,7 @@ import properties from './routes/properties/index';
 import getName from './routes/getName/index';
 import getSku from './routes/getSku/index';
 import getItemObject from './routes/getItemObject/index';
+import getItemGrade from './routes/getItemGrade/index';
 import getItem from './routes/getItem/index';
 import raw from './routes/raw/index';
 import root from './routes/index';
@@ -91,6 +92,9 @@ export default async function fastifySetup(server: FastifyInstance): Promise<voi
     });
     server.register(getItemObject, {
         prefix: '/getItemObject'
+    });
+    server.register(getItemGrade, {
+        prefix: '/getItemGrade'
     });
     server.register(getItem, {
         prefix: '/getItem'
