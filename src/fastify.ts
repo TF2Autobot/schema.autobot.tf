@@ -77,6 +77,9 @@ export default async function fastifySetup(server: FastifyInstance): Promise<voi
     server.register(schema, {
         prefix: '/schema'
     });
+    server.register(raw, {
+        prefix: '/raw'
+    });
     server.register(properties, {
         prefix: '/properties'
     });
@@ -91,9 +94,6 @@ export default async function fastifySetup(server: FastifyInstance): Promise<voi
     });
     server.register(getItem, {
         prefix: '/getItem'
-    });
-    server.register(raw, {
-        prefix: '/raw'
     });
 
     const port = parseInt(process.env.PORT, 10);

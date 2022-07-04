@@ -9,7 +9,7 @@ const schema: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
         {
             schema: {
                 description: 'Get Team Fortress 2 Item Schema (Warning: Might cause browser to freeze)',
-                tags: ['Schema (raw)']
+                tags: ['Schema']
             }
         },
         (req, reply) => {
@@ -25,7 +25,7 @@ const schema: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
         {
             schema: {
                 description: 'Download the Team Fortress 2 Item Schema',
-                tags: ['Schema (raw)']
+                tags: ['Schema']
             }
         },
         (req, reply) => {
@@ -45,7 +45,7 @@ const schema: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
         {
             schema: {
                 description: 'Request to refresh schema (only once per 30 minutes globally)',
-                tags: ['Schema (raw)']
+                tags: ['Schema']
             }
         },
         async (req, reply) => {

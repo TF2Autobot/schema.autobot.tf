@@ -7,7 +7,7 @@ const raw: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOpti
         {
             schema: {
                 description: 'Raw value for "raw.schema[key]"',
-                tags: ['Raw'],
+                tags: ['Schema (raw)'],
                 params: {
                     key: {
                         type: 'string',
@@ -51,7 +51,7 @@ const raw: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOpti
         {
             schema: {
                 description: 'Raw value for "raw.items_game[key]"',
-                tags: ['Raw'],
+                tags: ['Schema (raw)'],
                 params: {
                     key: {
                         type: 'string',
