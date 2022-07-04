@@ -239,7 +239,7 @@ const getItemObject: FastifyPluginAsync = async (app: FastifyInstance, opts?: Re
                     .send({ success: true, itemObject });
             } catch (err) {
                 return reply
-                    .code(500)
+                    .code(400)
                     .header('Content-Type', 'application/json; charset=utf-8')
                     .send({ success: false, message: err });
             }
@@ -303,7 +303,7 @@ const getItemObject: FastifyPluginAsync = async (app: FastifyInstance, opts?: Re
                     itemObjects.push(parsedEcon.item);
                 } catch (err) {
                     return reply
-                        .code(500)
+                        .code(400)
                         .header('Content-Type', 'application/json; charset=utf-8')
                         .send({ success: false, message: err });
                 }

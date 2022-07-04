@@ -257,7 +257,7 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
                     .send({ success: true, sku });
             } catch (err) {
                 return reply
-                    .code(500)
+                    .code(400)
                     .header('Content-Type', 'application/json; charset=utf-8')
                     .send({ success: false, message: err });
             }
@@ -321,7 +321,7 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
                     skus.push(parsedEcon.sku);
                 } catch (err) {
                     return reply
-                        .code(500)
+                        .code(400)
                         .header('Content-Type', 'application/json; charset=utf-8')
                         .send({ success: false, message: err });
                 }
