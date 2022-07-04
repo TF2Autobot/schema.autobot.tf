@@ -44,7 +44,7 @@ const schema: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
         '/refresh',
         {
             schema: {
-                description: 'Request to refresh schema (only once per 30 minutes/global)',
+                description: 'Request to refresh schema (only once per 30 minutes globally)',
                 tags: ['Schema (raw)']
             }
         },
