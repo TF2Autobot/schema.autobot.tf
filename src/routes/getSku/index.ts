@@ -3,6 +3,9 @@ import SchemaManager from '../../schemaManager';
 import { Item } from '@tf2autobot/tf2-schema';
 import SKU from '@tf2autobot/tf2-sku';
 import Redis from '../../redis';
+import { EconItem } from '../../types/EconItem';
+import parseEcon from '../../lib/econParser/parseEcon';
+import { multiple1, multiple2, single1, single2 } from '../../lib/examples/econ';
 
 const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOptions): Promise<void> => {
     app.post(
@@ -178,6 +181,151 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
                     }
                 }
             }
+
+            return reply
+                .code(200)
+                .header('Content-Type', 'application/json; charset=utf-8')
+                .send({ success: true, skus });
+        }
+    );
+
+    app.post(
+        '/fromEconItem',
+        {
+            schema: {
+                description: 'Get an item sku from Steam Econ item',
+                tags: ['Get item sku'],
+                querystring: {
+                    type: 'object',
+                    properties: {
+                        normalizeFestivizedItems: {
+                            type: 'boolean'
+                        },
+                        normalizeStrangeAsSecondQuality: {
+                            type: 'boolean'
+                        },
+                        normalizePainted: {
+                            type: 'boolean'
+                        }
+                    }
+                },
+                body: {
+                    $ref: 'econItem#',
+                    examples: [single1, single2]
+                }
+            }
+        },
+        (req, reply) => {
+            if (req.body === undefined) {
+                return reply.code(400).header('Content-Type', 'application/json; charset=utf-8').send({
+                    success: false,
+                    message: 'body of Econ item object MUST be defined'
+                });
+            }
+
+            const query = req.query as {
+                normalizeFestivizedItems: boolean;
+                normalizeStrangeAsSecondQuality: boolean;
+                normalizePainted: boolean;
+            };
+
+            const item = req.body as EconItem;
+
+            try {
+                const parsedEcon = parseEcon(
+                    item,
+                    SchemaManager.schemaManager.schema,
+                    query.normalizeFestivizedItems,
+                    query.normalizeStrangeAsSecondQuality,
+                    query.normalizePainted
+                );
+                const sku = parsedEcon.sku;
+
+                if (sku.includes(';null') || sku.includes(';undefined')) {
+                    return reply
+                        .code(404)
+                        .header('Content-Type', 'application/json; charset=utf-8')
+                        .send({
+                            success: false,
+                            message: `Generated sku: ${sku} - Please check the item name you've sent`
+                        });
+                }
+
+                return reply
+                    .code(200)
+                    .header('Content-Type', 'application/json; charset=utf-8')
+                    .send({ success: true, sku });
+            } catch (err) {
+                return reply
+                    .code(500)
+                    .header('Content-Type', 'application/json; charset=utf-8')
+                    .send({ success: false, message: err });
+            }
+        }
+    );
+
+    app.post(
+        '/fromEconItemBulk',
+        {
+            schema: {
+                description: 'Get item sku from Steam Econ item in bulk',
+                tags: ['Get item sku'],
+                querystring: {
+                    type: 'object',
+                    properties: {
+                        normalizeFestivizedItems: {
+                            type: 'boolean'
+                        },
+                        normalizeStrangeAsSecondQuality: {
+                            type: 'boolean'
+                        },
+                        normalizePainted: {
+                            type: 'boolean'
+                        }
+                    }
+                },
+                body: {
+                    type: 'array',
+                    items: {
+                        $ref: 'econItem#'
+                    },
+                    examples: [multiple1, multiple2]
+                }
+            }
+        },
+        (req, reply) => {
+            if (req.body === undefined) {
+                return reply.code(400).header('Content-Type', 'application/json; charset=utf-8').send({
+                    success: false,
+                    message: 'body of array of Econ item object MUST be defined'
+                });
+            }
+
+            const query = req.query as {
+                normalizeFestivizedItems: boolean;
+                normalizeStrangeAsSecondQuality: boolean;
+                normalizePainted: boolean;
+            };
+
+            const items = req.body as EconItem[];
+            const skus: string[] = [];
+            items.forEach(item => {
+                try {
+                    const parsedEcon = parseEcon(
+                        item,
+                        SchemaManager.schemaManager.schema,
+                        query.normalizeFestivizedItems,
+                        query.normalizeStrangeAsSecondQuality,
+                        query.normalizePainted
+                    );
+                    skus.push(parsedEcon.sku);
+                } catch (err) {
+                    return reply
+                        .code(500)
+                        .header('Content-Type', 'application/json; charset=utf-8')
+                        .send({ success: false, message: err });
+                }
+            });
 
             return reply
                 .code(200)

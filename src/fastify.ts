@@ -12,6 +12,7 @@ import getItem from './routes/getItem/index';
 import raw from './routes/raw/index';
 import root from './routes/index';
 import itemObjectProperties from './schemas/itemObject';
+import econItemProperties from './schemas/econItem';
 import Redis from './redis';
 
 export default async function fastifySetup(server: FastifyInstance): Promise<void> {
@@ -59,6 +60,14 @@ export default async function fastifySetup(server: FastifyInstance): Promise<voi
         type: 'object',
         required: ['defindex', 'quality'],
         properties: itemObjectProperties
+    });
+
+    server.addSchema({
+        $id: 'econItem',
+        type: 'object',
+        additionalProperties: true,
+        required: ['appid', 'descriptions', 'tradable', 'actions', 'market_hash_name', 'tags'],
+        properties: econItemProperties
     });
 
     log.debug('Initiaziling routes...');
