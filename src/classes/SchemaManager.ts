@@ -50,6 +50,7 @@ export default class SchemaManager {
     static setItemGrades(): void {
         // @ts-ignore
         const itemCollections = this.schemaManager.schema.raw.items_game.item_collections as ItemCollections;
+        const itemsGameItems = this.schemaManager.schema.raw.items_game.items;
         const obj = {};
         const obj2 = {};
 
@@ -77,8 +78,6 @@ export default class SchemaManager {
                 const items = Object.keys(itemCollections[itemCollection].items[grade]);
 
                 for (const name of items) {
-                    const itemsGameItems = this.schemaManager.schema.raw.items_game.items;
-
                     for (const defindex in itemsGameItems) {
                         if (!Object.prototype.hasOwnProperty.call(itemsGameItems, defindex)) {
                             continue;
