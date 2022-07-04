@@ -84,53 +84,26 @@ export default class SchemaManager {
                         }
 
                         if (name === itemsGameItems[defindex].name) {
-                            if (grade === 'common') {
-                                if (obj['Civilian Grade'] === undefined) {
-                                    obj['Civilian Grade'] = {};
-                                }
-                                obj['Civilian Grade'][name] = parseInt(defindex);
-                            } else if (grade === 'uncommon') {
-                                if (obj['Freelance Grade'] === undefined) {
-                                    obj['Freelance Grade'] = {};
-                                }
-                                obj['Freelance Grade'][name] = parseInt(defindex);
-                            } else if (grade === 'rare') {
-                                if (obj['Mercenary Grade'] === undefined) {
-                                    obj['Mercenary Grade'] = {};
-                                }
-                                obj['Mercenary Grade'][name] = parseInt(defindex);
-                            } else if (grade === 'mythical') {
-                                if (obj['Commando Grade'] === undefined) {
-                                    obj['Commando Grade'] = {};
-                                }
-                                obj['Commando Grade'][name] = parseInt(defindex);
-                            } else if (grade === 'legendary') {
-                                if (obj['Assassin Grade'] === undefined) {
-                                    obj['Assassin Grade'] = {};
-                                }
-                                obj['Assassin Grade'][name] = parseInt(defindex);
-                            } else if (grade === 'ancient') {
-                                if (obj['Elite Grade'] === undefined) {
-                                    obj['Elite Grade'] = {};
-                                }
-                                obj['Elite Grade'][name] = parseInt(defindex);
-                            }
+                            if (itemGrade.has(grade)) {
+                                const displayGrade = itemGrade.get(grade);
 
-                            obj2[defindex] = itemGrade.get(grade);
+                                if (obj[displayGrade] === undefined) {
+                                    obj[displayGrade] = {};
+                                }
+
+                                obj[displayGrade][name] = parseInt(defindex);
+                                obj2[defindex] = displayGrade;
+                            }
                         }
                     }
                 }
             }
         }
 
-        obj['count'] = {
-            'Civilian Grade': obj['Civilian Grade'] ? Object.keys(obj['Civilian Grade']).length : 0,
-            'Freelance Grade': obj['Freelance Grade'] ? Object.keys(obj['Freelance Grade']).length : 0,
-            'Mercenary Grade': obj['Mercenary Grade'] ? Object.keys(obj['Mercenary Grade']).length : 0,
-            'Commando Grade': obj['Commando Grade'] ? Object.keys(obj['Commando Grade']).length : 0,
-            'Assassin Grade': obj['Assassin Grade'] ? Object.keys(obj['Assassin Grade']).length : 0,
-            'Elite Grade': obj['Elite Grade'] ? Object.keys(obj['Elite Grade']).length : 0
-        };
+        obj['count'] = Object.keys(obj).reduce((objc, grade) => {
+            objc[grade] = Object.keys(obj[grade]).length;
+            return objc;
+        }, {});
 
         this.itemGrades = obj;
         this.itemGradeByDefindex = obj2;
