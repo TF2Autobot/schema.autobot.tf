@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyPluginAsync, RegisterOptions } from 'fastify';
-import SchemaManager from '../../schemaManager';
+import SchemaManager from '../../classes/SchemaManager';
 import SKU from '@tf2autobot/tf2-sku';
-import Redis from '../../redis';
+import Redis from '../../classes/Redis';
 import { Item } from '@tf2autobot/tf2-schema';
 
 const getItem: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOptions): Promise<void> => {

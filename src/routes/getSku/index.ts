@@ -1,8 +1,8 @@
 import { FastifyInstance, FastifyPluginAsync, FastifySchema, RegisterOptions } from 'fastify';
-import SchemaManager from '../../schemaManager';
+import SchemaManager from '../../classes/SchemaManager';
 import { Item } from '@tf2autobot/tf2-schema';
 import SKU from '@tf2autobot/tf2-sku';
-import Redis from '../../redis';
+import Redis from '../../classes/Redis';
 import { EconItem } from '../../types/EconItem';
 import parseEcon from '../../lib/econParser/parseEcon';
 import { multiple1, multiple2, single1, single2 } from '../../lib/examples/econ';

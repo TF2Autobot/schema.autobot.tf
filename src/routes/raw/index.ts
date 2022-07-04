@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyPluginAsync, RegisterOptions } from 'fastify';
-import SchemaManager from '../../schemaManager';
+import SchemaManager from '../../classes/SchemaManager';
 
 const raw: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOptions): Promise<void> => {
     app.get(

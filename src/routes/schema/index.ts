@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyPluginAsync, RegisterOptions } from 'fastify';
-import SchemaManager from '../../schemaManager';
+import SchemaManager from '../../classes/SchemaManager';
 import log from '../../lib/logger';
-import Redis from '../../redis';
+import Redis from '../../classes/Redis';
 
 const schema: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOptions): Promise<void> => {
     app.get(

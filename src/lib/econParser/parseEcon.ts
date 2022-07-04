@@ -3,7 +3,7 @@ import { EconItem } from '../../types/EconItem';
 import url from 'url';
 import { fixItem } from './fixItem';
 import { Schema } from '@tf2autobot/tf2-schema';
-import SchemaManager from '../../schemaManager';
+import SchemaManager from '../../classes/SchemaManager';
 import { Item } from 'src/types/TeamFortress2';
 
 let isCrate = false;

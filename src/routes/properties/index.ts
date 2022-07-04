@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyPluginAsync, RegisterOptions } from 'fastify';
-import SchemaManager from '../../schemaManager';
+import SchemaManager from '../../classes/SchemaManager';
 import { CharacterClasses } from '@tf2autobot/tf2-schema';
 
 const properties: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOptions): Promise<void> => {

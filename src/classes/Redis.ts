@@ -1,5 +1,5 @@
 import { createClient, RedisClientType } from 'redis';
-import log from './lib/logger';
+import log from '../lib/logger';
 
 export default class Redis {
     private static client: RedisClientType;

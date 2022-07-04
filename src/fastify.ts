@@ -1,4 +1,4 @@
-import SchemaManager from './schemaManager';
+import SchemaManager from './classes/SchemaManager';
 import log from './lib/logger';
 import fastifySwagger from '@fastify/swagger';
 import { FastifyInstance } from 'fastify';
@@ -13,7 +13,7 @@ import raw from './routes/raw/index';
 import root from './routes/index';
 import itemObjectProperties from './schemas/itemObject';
 import econItemProperties from './schemas/econItem';
-import Redis from './redis';
+import Redis from './classes/Redis';
 
 export default async function fastifySetup(server: FastifyInstance): Promise<void> {
     // @ts-ignore

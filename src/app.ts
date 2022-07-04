@@ -4,7 +4,7 @@ process.env.SERVER_VERSION = SERVER_VERSION as string;
 import genPaths from './resources/paths';
 import dotenv from 'dotenv';
 import log, { init } from './lib/logger';
-import SchemaManager from './schemaManager';
+import SchemaManager from './classes/SchemaManager';
 import fastify from 'fastify';
 import fastifySetup from './fastify';
 
@@ -17,7 +17,7 @@ fastifySetup(server);
 
 import ON_DEATH from 'death';
 import { inspect } from 'util';
-import Redis from './redis';
+import Redis from './classes/Redis';
 
 ON_DEATH({ uncaughtException: true })(async (signalOrErr, origin) => {
     const crashed = signalOrErr !== 'SIGINT';
