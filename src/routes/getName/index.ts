@@ -151,16 +151,17 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
         },
         async (req, reply) => {
             // @ts-ignore
-            const sku = req.params.sku as string;
+            const sku = decodeURIComponent(req.params.sku as string);
             const query = req.query as {
                 proper?: boolean;
                 usePipeForSkin?: boolean;
             };
 
             // gnfs - getName/FromSku
-            const itemNameCached = Redis.getCache(
+            const itemNameCached = await Redis.getCache(
                 `s_gnfs_${query.proper ? 'proper_' : ''}${query.usePipeForSkin ? 'pipe_' : ''}${sku}`
             );
+
             if (itemNameCached) {
                 return reply
                     .code(200)
