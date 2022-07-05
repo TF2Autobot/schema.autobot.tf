@@ -75,18 +75,18 @@ export default class SchemaManager {
                     continue;
                 }
 
-                const items = Object.keys(itemCollections[itemCollection].items[grade]);
+                if (itemGrade.has(grade)) {
+                    const displayGrade = itemGrade.get(grade);
 
-                for (const name of items) {
-                    for (const defindex in itemsGameItems) {
-                        if (!Object.prototype.hasOwnProperty.call(itemsGameItems, defindex)) {
-                            continue;
-                        }
+                    const items = Object.keys(itemCollections[itemCollection].items[grade]);
 
-                        if (name === itemsGameItems[defindex].name) {
-                            if (itemGrade.has(grade)) {
-                                const displayGrade = itemGrade.get(grade);
+                    for (const name of items) {
+                        for (const defindex in itemsGameItems) {
+                            if (!Object.prototype.hasOwnProperty.call(itemsGameItems, defindex)) {
+                                continue;
+                            }
 
+                            if (name === itemsGameItems[defindex].name) {
                                 if (obj[displayGrade] === undefined) {
                                     obj[displayGrade] = {};
                                 }
