@@ -184,10 +184,16 @@ const econItemProperties = {
         }
     },
     owner_descriptions: {
-        type: 'array'
+        type: 'array',
+        items: {
+            type: 'any'
+        }
     },
     owner_actions: {
-        type: 'array'
+        type: 'array',
+        items: {
+            type: 'any'
+        }
     }
 };
 
