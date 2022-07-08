@@ -186,13 +186,13 @@ const econItemProperties = {
     owner_descriptions: {
         type: 'array',
         items: {
-            type: 'any'
+            type: 'string'
         }
     },
     owner_actions: {
         type: 'array',
         items: {
-            type: 'any'
+            type: 'string'
         }
     }
 };
