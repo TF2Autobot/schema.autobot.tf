@@ -279,23 +279,24 @@ export default class SchemaManager {
             const onlyNewPaintkits: { id: number; name: string; defindex: string }[] = [];
             const items = this.schemaManager.schema.raw.items_game.items;
             const itemsDefindex = Object.keys(this.schemaManager.schema.raw.items_game.items);
+            const itemsDefindexCount = itemsDefindex.length;
 
             newPaintkits.forEach(paintkit => {
                 if (this.oldPaintkits[paintkit] === undefined) {
-                    onlyNewPaintkits.push(
-                        {
-                            id: this.newPaintkits[paintkit],
-                            name: paintkit,
-                            defindex: itemsDefindex.reduce((defindexTarget, defindexCurrent) => {
-                                if (`Paintkit ${this.newPaintkits[paintkit]}` === items[defindexCurrent]?.name) {
-                                    defindexTarget = defindexCurrent;
-                                }
+                    let defindex: string = null;
 
-                                return defindexTarget;
-                            })
-                        },
-                        null
-                    );
+                    for (let i = 0; i < itemsDefindexCount; i++) {
+                        if (`Paintkit ${this.newPaintkits[paintkit]}` === items[itemsDefindex[i]].name) {
+                            defindex = itemsDefindex[i];
+                            break;
+                        }
+                    }
+
+                    onlyNewPaintkits.push({
+                        id: this.newPaintkits[paintkit],
+                        name: paintkit,
+                        defindex
+                    });
                 }
             });
 
