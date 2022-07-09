@@ -1,6 +1,7 @@
 import SchemaTF2 from '@tf2autobot/tf2-schema';
 import axios from 'axios';
 import log from '../lib/logger';
+import Redis from './Redis';
 
 const itemGrade = new Map();
 itemGrade
@@ -34,7 +35,7 @@ export default class SchemaManager {
             this.schemaManager.on('schema', () => {
                 this.setDefindexes();
                 this.newDefindexes = this.defindexes;
-                this.checkNewItems();
+                void this.checkNewItems();
                 this.setItemGrades();
             });
 
@@ -117,7 +118,7 @@ export default class SchemaManager {
         this.itemGradeByDefindex = obj2;
     }
 
-    private static checkNewItems(): void {
+    private static async checkNewItems(): Promise<void> {
         if (this.oldDefindexes === undefined) {
             // first run
             this.oldDefindexes = this.defindexes;
@@ -135,6 +136,12 @@ export default class SchemaManager {
                     newItems.push({ defindex, item_name: this.newDefindexes[defindex] });
                 }
             });
+
+            const alreadySent = await Redis.getCache('s_alreadySentItemsUpdateWebhook');
+            if (alreadySent === 'true') {
+                this.oldDefindexes = this.defindexes;
+                return;
+            }
 
             if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
                 void axios({
@@ -161,10 +168,14 @@ export default class SchemaManager {
                             }
                         ]
                     }
-                }).catch(err => {
-                    log.warn('Error sending webhook on new items update');
-                    log.error(err);
-                });
+                })
+                    .then(() => {
+                        Redis.setCachex('s_alreadySentItemsUpdateWebhook', 10 * 60 * 1000, 'true');
+                    })
+                    .catch(err => {
+                        log.warn('Error sending webhook on new items update');
+                        log.error(err);
+                    });
             }
         }
 
