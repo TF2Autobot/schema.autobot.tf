@@ -25,6 +25,10 @@ export default class SchemaManager {
 
     private static newEffects: Record<string, number>;
 
+    private static newPaintkits: Record<string, number>;
+
+    private static oldPaintkits: Record<string, number>;
+
     static itemGrades: Record<string, any>;
 
     static itemGradeByDefindex: { [defindex: string]: string };
@@ -40,8 +44,11 @@ export default class SchemaManager {
                 this.setDefindexes();
                 this.newDefindexes = this.defindexes;
                 this.newEffects = this.schemaManager.schema.effects;
+                this.newPaintkits = this.schemaManager.schema.paintkits;
                 void this.checkNewItems().then(() => {
-                    void this.checkNewEffects();
+                    void this.checkNewEffects().then(() => {
+                        void this.checkNewPaintkits();
+                    });
                 });
                 this.setItemGrades();
             });
@@ -252,6 +259,89 @@ export default class SchemaManager {
         }
 
         this.oldEffects = this.schemaManager.schema.effects;
+    }
+
+    private static async checkNewPaintkits(): Promise<void> {
+        if (this.oldPaintkits === undefined) {
+            this.oldPaintkits = this.schemaManager.schema.paintkits;
+            return;
+        }
+
+        const oldPaintkits = Object.keys(this.oldPaintkits);
+        const newPaintkits = Object.keys(this.newPaintkits);
+
+        if (newPaintkits.length > oldPaintkits.length) {
+            // new paintkits added
+            const onlyNewPaintkits: { id: number; name: string; defindex: string }[] = [];
+            const items = this.schemaManager.schema.raw.items_game.items;
+            const itemsDefindex = Object.keys(this.schemaManager.schema.raw.items_game.items);
+
+            newPaintkits.forEach(paintkit => {
+                if (this.oldPaintkits[paintkit] === undefined) {
+                    onlyNewPaintkits.push(
+                        {
+                            id: this.newPaintkits[paintkit],
+                            name: paintkit,
+                            defindex: itemsDefindex.reduce((defindexTarget, defindexCurrent) => {
+                                if (`Paintkit ${this.newPaintkits[paintkit]}` === items[defindexCurrent]?.name) {
+                                    defindexTarget = defindexCurrent;
+                                    return defindexTarget;
+                                }
+                            })
+                        },
+                        null
+                    );
+                }
+            });
+
+            const alreadySent = await Redis.getCache('s_alreadySentPaintkitsUpdateWebhook');
+            if (alreadySent === 'true') {
+                this.oldPaintkits = this.schemaManager.schema.paintkits;
+                return;
+            }
+
+            if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
+                // just use the same link
+                void axios({
+                    method: 'POST',
+                    url: process.env.ITEMS_UPDATE_WEBHOOK_URL,
+                    data: {
+                        username: 'Schema.autobot.tf',
+                        avatar_url: 'https://autobot.tf/images/tf2autobot.png',
+                        embeds: [
+                            {
+                                title: '__**New Paintkit(s)/Texture(s) added**__',
+                                description:
+                                    '• ' +
+                                    onlyNewPaintkits
+                                        .map(
+                                            paintkit =>
+                                                `${
+                                                    paintkit.defindex !== null
+                                                        ? `[${paintkit.id}](https://scrap.tf/img/items/warpaint/${paintkit.defindex}_${paintkit.id}_1_0.png)`
+                                                        : paintkit.id
+                                                }: ${paintkit.name}`
+                                        )
+                                        .join('\n• '),
+                                color: '16711422', // Decorated Weapon color
+                                footer: {
+                                    text: `${new Date().toUTCString()} • v${process.env.SERVER_VERSION}`
+                                }
+                            }
+                        ]
+                    }
+                })
+                    .then(() => {
+                        Redis.setCachex('s_alreadySentPaintkitsUpdateWebhook', 10 * 60 * 1000, 'true');
+                    })
+                    .catch(err => {
+                        log.warn('Error sending webhook on new paintkits update');
+                        log.error(err);
+                    });
+            }
+        }
+
+        this.oldPaintkits = this.schemaManager.schema.paintkits;
     }
 }
 
