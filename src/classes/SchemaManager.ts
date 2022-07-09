@@ -40,17 +40,21 @@ export default class SchemaManager {
                 updateTime: 5 * 60 * 1000
             });
 
-            this.schemaManager.on('schema', () => {
+            this.schemaManager.on('schema', async () => {
                 this.setDefindexes();
+                this.setItemGrades();
                 this.newDefindexes = this.defindexes;
                 this.newEffects = this.schemaManager.schema.effects;
                 this.newPaintkits = this.schemaManager.schema.paintkits;
-                void this.checkNewItems().then(() => {
-                    void this.checkNewEffects().then(() => {
-                        void this.checkNewPaintkits();
-                    });
-                });
-                this.setItemGrades();
+
+                try {
+                    await this.checkNewItems();
+                    await this.checkNewEffects();
+                    await this.checkNewPaintkits();
+                } catch (err) {
+                    log.warn('Error while checking for new items/effects/paintkits');
+                    log.error(err);
+                }
             });
 
             this.schemaManager.init(err => {
