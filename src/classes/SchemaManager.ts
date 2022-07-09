@@ -278,7 +278,7 @@ export default class SchemaManager {
             // new paintkits added
             const onlyNewPaintkits: { id: number; name: string; defindex: string }[] = [];
             const items = this.schemaManager.schema.raw.items_game.items;
-            const itemsDefindex = Object.keys(this.schemaManager.schema.raw.items_game.items);
+            const itemsDefindex = Object.keys(items);
             const itemsDefindexCount = itemsDefindex.length;
 
             newPaintkits.forEach(paintkit => {
