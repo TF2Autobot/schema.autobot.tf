@@ -1,4 +1,6 @@
 import SchemaTF2 from '@tf2autobot/tf2-schema';
+import axios from 'axios';
+import log from '../lib/logger';
 
 const itemGrade = new Map();
 itemGrade
@@ -14,6 +16,10 @@ export default class SchemaManager {
 
     static defindexes: Record<string, string>;
 
+    private static oldDefindexes: Record<string, string>;
+
+    private static newDefindexes: Record<string, string>;
+
     static itemGrades: Record<string, any>;
 
     static itemGradeByDefindex: { [defindex: string]: string };
@@ -27,6 +33,8 @@ export default class SchemaManager {
 
             this.schemaManager.on('schema', () => {
                 this.setDefindexes();
+                this.newDefindexes = this.defindexes;
+                this.checkNewItems();
                 this.setItemGrades();
             });
 
@@ -107,6 +115,60 @@ export default class SchemaManager {
 
         this.itemGrades = obj;
         this.itemGradeByDefindex = obj2;
+    }
+
+    private static checkNewItems(): void {
+        if (this.oldDefindexes === undefined) {
+            // first run
+            this.oldDefindexes = this.defindexes;
+            return;
+        }
+
+        const oldDefindexes = Object.keys(this.oldDefindexes);
+        const newDefindexes = Object.keys(this.newDefindexes);
+
+        if (newDefindexes.length > oldDefindexes.length) {
+            // new items added
+            const newItems: { defindex: string; item_name: string }[] = [];
+            newDefindexes.forEach(defindex => {
+                if (this.oldDefindexes[defindex] === undefined) {
+                    newItems.push({ defindex, item_name: this.newDefindexes[defindex] });
+                }
+            });
+
+            if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
+                void axios({
+                    method: 'POST',
+                    url: process.env.ITEMS_UPDATE_WEBHOOK_URL,
+                    data: {
+                        username: 'Schema.autobot.tf',
+                        avatar_url: 'https://autobot.tf/images/tf2autobot.png',
+                        embeds: [
+                            {
+                                title: '__**New item(s) added**__',
+                                description:
+                                    '• ' +
+                                    newItems
+                                        .map(
+                                            item =>
+                                                `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${item.defindex}): ${item.item_name}`
+                                        )
+                                        .join('\n• '),
+                                color: '9171753', // Green
+                                footer: {
+                                    text: `${new Date().toUTCString()} • v${process.env.SERVER_VERSION}`
+                                }
+                            }
+                        ]
+                    }
+                }).catch(err => {
+                    log.warn('Error sending webhook on new items update');
+                    log.error(err);
+                });
+            }
+        }
+
+        this.oldDefindexes = this.defindexes;
     }
 }
 

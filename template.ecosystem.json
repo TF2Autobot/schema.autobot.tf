@@ -17,7 +17,9 @@
                 "PORT": 3000,
                 "REDIS_URL": "",
                 "REDIS_USERNAME": "",
-                "REDIS_PASSWORD": ""
+                "REDIS_PASSWORD": "",
+
+                "ITEMS_UPDATE_WEBHOOK_URL": ""
             }
         }
     ]
