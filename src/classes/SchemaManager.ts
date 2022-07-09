@@ -158,7 +158,7 @@ export default class SchemaManager {
                                     newItems
                                         .map(
                                             item =>
-                                                `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${item.defindex}): ${item.item_name}`
+                                                `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${item.defindex}): [${item.item_name}](https://autobot.tf/items/${item.defindex};6)`
                                         )
                                         .join('\n• '),
                                 color: '9171753', // Green
