@@ -289,8 +289,9 @@ export default class SchemaManager {
                             defindex: itemsDefindex.reduce((defindexTarget, defindexCurrent) => {
                                 if (`Paintkit ${this.newPaintkits[paintkit]}` === items[defindexCurrent]?.name) {
                                     defindexTarget = defindexCurrent;
-                                    return defindexTarget;
                                 }
+
+                                return defindexTarget;
                             })
                         },
                         null
