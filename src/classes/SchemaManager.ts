@@ -21,6 +21,10 @@ export default class SchemaManager {
 
     private static newDefindexes: Record<string, string>;
 
+    private static oldEffects: Record<string, number>;
+
+    private static newEffects: Record<string, number>;
+
     static itemGrades: Record<string, any>;
 
     static itemGradeByDefindex: { [defindex: string]: string };
@@ -35,7 +39,10 @@ export default class SchemaManager {
             this.schemaManager.on('schema', () => {
                 this.setDefindexes();
                 this.newDefindexes = this.defindexes;
-                void this.checkNewItems();
+                this.newEffects = this.schemaManager.schema.effects;
+                void this.checkNewItems().then(() => {
+                    void this.checkNewEffects();
+                });
                 this.setItemGrades();
             });
 
@@ -180,6 +187,71 @@ export default class SchemaManager {
         }
 
         this.oldDefindexes = this.defindexes;
+    }
+
+    private static async checkNewEffects(): Promise<void> {
+        if (this.oldEffects === undefined) {
+            this.oldEffects = this.schemaManager.schema.effects;
+            return;
+        }
+
+        const oldEffects = Object.keys(this.oldEffects);
+        const newEffects = Object.keys(this.newEffects);
+
+        if (newEffects.length > oldEffects.length) {
+            // new effects added
+            const onlyNewEffects: { id: number; name: string }[] = [];
+
+            newEffects.forEach(effect => {
+                if (this.oldEffects[effect] === undefined) {
+                    onlyNewEffects.push({ id: this.newEffects[effect], name: effect });
+                }
+            });
+
+            const alreadySent = await Redis.getCache('s_alreadySentEffectsUpdateWebhook');
+            if (alreadySent === 'true') {
+                this.oldEffects = this.schemaManager.schema.effects;
+                return;
+            }
+
+            if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
+                // just use the same link
+                void axios({
+                    method: 'POST',
+                    url: process.env.ITEMS_UPDATE_WEBHOOK_URL,
+                    data: {
+                        username: 'Schema.autobot.tf',
+                        avatar_url: 'https://autobot.tf/images/tf2autobot.png',
+                        embeds: [
+                            {
+                                title: '__**New particle effect(s) added**__',
+                                description:
+                                    '• ' +
+                                    onlyNewEffects
+                                        .map(
+                                            effect =>
+                                                `[${effect.id}](https://autobot.tf/images/effects/${effect.id}_94x94.png): ${effect.name}`
+                                        )
+                                        .join('\n• '),
+                                color: '8802476', // Unusual color
+                                footer: {
+                                    text: `${new Date().toUTCString()} • v${process.env.SERVER_VERSION}`
+                                }
+                            }
+                        ]
+                    }
+                })
+                    .then(() => {
+                        Redis.setCachex('s_alreadySentEffectsUpdateWebhook', 10 * 60 * 1000, 'true');
+                    })
+                    .catch(err => {
+                        log.warn('Error sending webhook on new effects update');
+                        log.error(err);
+                    });
+            }
+        }
+
+        this.oldEffects = this.schemaManager.schema.effects;
     }
 }
 
