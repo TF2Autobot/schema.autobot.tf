@@ -240,7 +240,7 @@ export default class SchemaManager {
                             onlyNewEffects
                                 .map(
                                     effect =>
-                                        `[${effect.id}](https://autobot.tf/images/effects/${effect.id}_94x94.png): ${effect.name}`
+                                        `[${effect.id}](https://autobot.tf/images/effects/${effect.id}_380x380.png): ${effect.name}`
                                 )
                                 .join('\n• '),
                         color: '8802476' // Unusual color
