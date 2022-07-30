@@ -170,27 +170,22 @@ export default class SchemaManager {
             }
 
             if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
-                WebhookQueue.enqueue(process.env.ITEMS_UPDATE_WEBHOOK_URL, 'items', {
-                    username: 'Schema.autobot.tf',
-                    avatar_url: 'https://autobot.tf/images/tf2autobot.png',
-                    embeds: [
-                        {
-                            title: '__**New item(s) added**__',
-                            description:
-                                '• ' +
-                                newItems
-                                    .map(
-                                        item =>
-                                            `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${item.defindex}): [${item.item_name}](https://autobot.tf/items/${item.defindex};6)`
-                                    )
-                                    .join('\n• '),
-                            color: '9171753', // Green
-                            footer: {
-                                text: `${new Date().toUTCString()} • v${process.env.SERVER_VERSION}`
-                            }
-                        }
-                    ]
-                });
+                WebhookQueue.enqueue(
+                    process.env.ITEMS_UPDATE_WEBHOOK_URL,
+                    'items',
+                    constructWebhook({
+                        title: '__**New item(s) added**__',
+                        description:
+                            '• ' +
+                            newItems
+                                .map(
+                                    item =>
+                                        `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${item.defindex}): [${item.item_name}](https://autobot.tf/items/${item.defindex};6)`
+                                )
+                                .join('\n• '),
+                        color: '9171753' // Green
+                    })
+                );
             }
         }
 
@@ -224,27 +219,23 @@ export default class SchemaManager {
 
             if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
                 // just use the same link
-                WebhookQueue.enqueue(process.env.ITEMS_UPDATE_WEBHOOK_URL, 'effects', {
-                    username: 'Schema.autobot.tf',
-                    avatar_url: 'https://autobot.tf/images/tf2autobot.png',
-                    embeds: [
-                        {
-                            title: '__**New particle effect(s) added**__',
-                            description:
-                                '• ' +
-                                onlyNewEffects
-                                    .map(
-                                        effect =>
-                                            `[${effect.id}](https://autobot.tf/images/effects/${effect.id}_94x94.png): ${effect.name}`
-                                    )
-                                    .join('\n• '),
-                            color: '8802476', // Unusual color
-                            footer: {
-                                text: `${new Date().toUTCString()} • v${process.env.SERVER_VERSION}`
-                            }
-                        }
-                    ]
-                });
+
+                WebhookQueue.enqueue(
+                    process.env.ITEMS_UPDATE_WEBHOOK_URL,
+                    'effects',
+                    constructWebhook({
+                        title: '__**New particle effect(s) added**__',
+                        description:
+                            '• ' +
+                            onlyNewEffects
+                                .map(
+                                    effect =>
+                                        `[${effect.id}](https://autobot.tf/images/effects/${effect.id}_94x94.png): ${effect.name}`
+                                )
+                                .join('\n• '),
+                        color: '8802476' // Unusual color
+                    })
+                );
             }
         }
 
@@ -295,36 +286,56 @@ export default class SchemaManager {
             if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
                 // just use the same link
 
-                WebhookQueue.enqueue(process.env.ITEMS_UPDATE_WEBHOOK_URL, 'paintkits', {
-                    username: 'Schema.autobot.tf',
-                    avatar_url: 'https://autobot.tf/images/tf2autobot.png',
-                    embeds: [
-                        {
-                            title: '__**New Paintkit(s)/Texture(s) added**__',
-                            description:
-                                '• ' +
-                                onlyNewPaintkits
-                                    .map(
-                                        paintkit =>
-                                            `${
-                                                paintkit.defindex !== null
-                                                    ? `[${paintkit.id}](https://scrap.tf/img/items/warpaint/${paintkit.defindex}_${paintkit.id}_1_0.png)`
-                                                    : paintkit.id
-                                            }: ${paintkit.name}`
-                                    )
-                                    .join('\n• '),
-                            color: '16711422', // Decorated Weapon color
-                            footer: {
-                                text: `${new Date().toUTCString()} • v${process.env.SERVER_VERSION}`
-                            }
-                        }
-                    ]
-                });
+                WebhookQueue.enqueue(
+                    process.env.ITEMS_UPDATE_WEBHOOK_URL,
+                    'paintkits',
+                    constructWebhook({
+                        title: '__**New Paintkit(s)/Texture(s) added**__',
+                        description:
+                            '• ' +
+                            onlyNewPaintkits
+                                .map(
+                                    paintkit =>
+                                        `${
+                                            paintkit.defindex !== null
+                                                ? `[${paintkit.id}](https://scrap.tf/img/items/warpaint/${paintkit.defindex}_${paintkit.id}_1_0.png)`
+                                                : paintkit.id
+                                        }: ${paintkit.name}`
+                                )
+                                .join('\n• '),
+                        color: '16711422'
+                    })
+                );
             }
         }
 
         this.oldPaintkits = this.schemaManager.schema.paintkits;
     }
+}
+
+function constructWebhook({
+    title,
+    description,
+    color
+}: {
+    title: string;
+    description: string;
+    color: string;
+}): Webhook {
+    return {
+        username: 'Schema.autobot.tf',
+        avatar_url: 'https://autobot.tf/images/tf2autobot.png',
+        embeds: [
+            {
+                title,
+                description,
+                color,
+                footer: {
+                    text: `${new Date().toUTCString()} • v${process.env.SERVER_VERSION}`
+                }
+            }
+        ]
+    };
 }
 
 type WebhookType = 'items' | 'effects' | 'paintkits';
