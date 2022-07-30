@@ -1,7 +1,9 @@
 import SchemaTF2 from '@tf2autobot/tf2-schema';
 import axios from 'axios';
 import log from '../lib/logger';
+import { Webhook } from '../types/DiscordWebhook';
 import Redis from './Redis';
+import * as timersPromises from 'timers/promises';
 
 const itemGrade = new Map();
 itemGrade
@@ -168,38 +170,27 @@ export default class SchemaManager {
             }
 
             if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
-                void axios({
-                    method: 'POST',
-                    url: process.env.ITEMS_UPDATE_WEBHOOK_URL,
-                    data: {
-                        username: 'Schema.autobot.tf',
-                        avatar_url: 'https://autobot.tf/images/tf2autobot.png',
-                        embeds: [
-                            {
-                                title: '__**New item(s) added**__',
-                                description:
-                                    '• ' +
-                                    newItems
-                                        .map(
-                                            item =>
-                                                `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${item.defindex}): [${item.item_name}](https://autobot.tf/items/${item.defindex};6)`
-                                        )
-                                        .join('\n• '),
-                                color: '9171753', // Green
-                                footer: {
-                                    text: `${new Date().toUTCString()} • v${process.env.SERVER_VERSION}`
-                                }
+                WebhookQueue.enqueue(process.env.ITEMS_UPDATE_WEBHOOK_URL, 'items', {
+                    username: 'Schema.autobot.tf',
+                    avatar_url: 'https://autobot.tf/images/tf2autobot.png',
+                    embeds: [
+                        {
+                            title: '__**New item(s) added**__',
+                            description:
+                                '• ' +
+                                newItems
+                                    .map(
+                                        item =>
+                                            `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${item.defindex}): [${item.item_name}](https://autobot.tf/items/${item.defindex};6)`
+                                    )
+                                    .join('\n• '),
+                            color: '9171753', // Green
+                            footer: {
+                                text: `${new Date().toUTCString()} • v${process.env.SERVER_VERSION}`
                             }
-                        ]
-                    }
-                })
-                    .then(() => {
-                        Redis.setCachex('s_alreadySentItemsUpdateWebhook', 10 * 60 * 1000, 'true');
-                    })
-                    .catch(err => {
-                        log.warn('Error sending webhook on new items update');
-                        log.error(err);
-                    });
+                        }
+                    ]
+                });
             }
         }
 
@@ -233,38 +224,27 @@ export default class SchemaManager {
 
             if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
                 // just use the same link
-                void axios({
-                    method: 'POST',
-                    url: process.env.ITEMS_UPDATE_WEBHOOK_URL,
-                    data: {
-                        username: 'Schema.autobot.tf',
-                        avatar_url: 'https://autobot.tf/images/tf2autobot.png',
-                        embeds: [
-                            {
-                                title: '__**New particle effect(s) added**__',
-                                description:
-                                    '• ' +
-                                    onlyNewEffects
-                                        .map(
-                                            effect =>
-                                                `[${effect.id}](https://autobot.tf/images/effects/${effect.id}_94x94.png): ${effect.name}`
-                                        )
-                                        .join('\n• '),
-                                color: '8802476', // Unusual color
-                                footer: {
-                                    text: `${new Date().toUTCString()} • v${process.env.SERVER_VERSION}`
-                                }
+                WebhookQueue.enqueue(process.env.ITEMS_UPDATE_WEBHOOK_URL, 'effects', {
+                    username: 'Schema.autobot.tf',
+                    avatar_url: 'https://autobot.tf/images/tf2autobot.png',
+                    embeds: [
+                        {
+                            title: '__**New particle effect(s) added**__',
+                            description:
+                                '• ' +
+                                onlyNewEffects
+                                    .map(
+                                        effect =>
+                                            `[${effect.id}](https://autobot.tf/images/effects/${effect.id}_94x94.png): ${effect.name}`
+                                    )
+                                    .join('\n• '),
+                            color: '8802476', // Unusual color
+                            footer: {
+                                text: `${new Date().toUTCString()} • v${process.env.SERVER_VERSION}`
                             }
-                        ]
-                    }
-                })
-                    .then(() => {
-                        Redis.setCachex('s_alreadySentEffectsUpdateWebhook', 10 * 60 * 1000, 'true');
-                    })
-                    .catch(err => {
-                        log.warn('Error sending webhook on new effects update');
-                        log.error(err);
-                    });
+                        }
+                    ]
+                });
             }
         }
 
@@ -314,46 +294,101 @@ export default class SchemaManager {
 
             if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
                 // just use the same link
-                void axios({
-                    method: 'POST',
-                    url: process.env.ITEMS_UPDATE_WEBHOOK_URL,
-                    data: {
-                        username: 'Schema.autobot.tf',
-                        avatar_url: 'https://autobot.tf/images/tf2autobot.png',
-                        embeds: [
-                            {
-                                title: '__**New Paintkit(s)/Texture(s) added**__',
-                                description:
-                                    '• ' +
-                                    onlyNewPaintkits
-                                        .map(
-                                            paintkit =>
-                                                `${
-                                                    paintkit.defindex !== null
-                                                        ? `[${paintkit.id}](https://scrap.tf/img/items/warpaint/${paintkit.defindex}_${paintkit.id}_1_0.png)`
-                                                        : paintkit.id
-                                                }: ${paintkit.name}`
-                                        )
-                                        .join('\n• '),
-                                color: '16711422', // Decorated Weapon color
-                                footer: {
-                                    text: `${new Date().toUTCString()} • v${process.env.SERVER_VERSION}`
-                                }
+
+                WebhookQueue.enqueue(process.env.ITEMS_UPDATE_WEBHOOK_URL, 'paintkits', {
+                    username: 'Schema.autobot.tf',
+                    avatar_url: 'https://autobot.tf/images/tf2autobot.png',
+                    embeds: [
+                        {
+                            title: '__**New Paintkit(s)/Texture(s) added**__',
+                            description:
+                                '• ' +
+                                onlyNewPaintkits
+                                    .map(
+                                        paintkit =>
+                                            `${
+                                                paintkit.defindex !== null
+                                                    ? `[${paintkit.id}](https://scrap.tf/img/items/warpaint/${paintkit.defindex}_${paintkit.id}_1_0.png)`
+                                                    : paintkit.id
+                                            }: ${paintkit.name}`
+                                    )
+                                    .join('\n• '),
+                            color: '16711422', // Decorated Weapon color
+                            footer: {
+                                text: `${new Date().toUTCString()} • v${process.env.SERVER_VERSION}`
                             }
-                        ]
-                    }
-                })
-                    .then(() => {
-                        Redis.setCachex('s_alreadySentPaintkitsUpdateWebhook', 10 * 60 * 1000, 'true');
-                    })
-                    .catch(err => {
-                        log.warn('Error sending webhook on new paintkits update');
-                        log.error(err);
-                    });
+                        }
+                    ]
+                });
             }
         }
 
         this.oldPaintkits = this.schemaManager.schema.paintkits;
+    }
+}
+
+type WebhookType = 'items' | 'effects' | 'paintkits';
+
+class WebhookQueue {
+    private static webhooks: { url: string; type: WebhookType; webhook: Webhook }[] = [];
+
+    private static sleepTime = 1000;
+
+    private static isRateLimited = false;
+
+    private static isProcessing = false;
+
+    static enqueue(url: string, type: WebhookType, webhook: Webhook): void {
+        this.webhooks.push({ url, type, webhook });
+
+        void this.process();
+    }
+
+    private static dequeue(): void {
+        this.webhooks.shift();
+    }
+
+    private static async process(): Promise<void> {
+        const webhook = this.webhooks[0];
+
+        if (webhook === undefined || this.isProcessing === true) {
+            return;
+        }
+
+        this.isProcessing = true;
+
+        await timersPromises.setTimeout(this.sleepTime);
+
+        if (this.isRateLimited) {
+            this.sleepTime = 1000;
+            this.isRateLimited = false;
+        }
+
+        void axios({
+            method: 'POST',
+            url: webhook.url,
+            data: webhook.webhook
+        })
+            .then(() => {
+                if (webhook.type === 'items') {
+                    Redis.setCachex('s_alreadySentItemsUpdateWebhook', 10 * 60 * 1000, 'true');
+                } else if (webhook.type === 'effects') {
+                    Redis.setCachex('s_alreadySentEffectsUpdateWebhook', 10 * 60 * 1000, 'true');
+                } else if (webhook.type === 'paintkits') {
+                    Redis.setCachex('s_alreadySentPaintkitsUpdateWebhook', 10 * 60 * 1000, 'true');
+                }
+            })
+            .catch(err => {
+                if (webhook.type === 'items') {
+                    log.warn('Error sending webhook on new items update');
+                } else if (webhook.type === 'effects') {
+                    log.warn('Error sending webhook on new effects update');
+                } else if (webhook.type === 'paintkits') {
+                    log.warn('Error sending webhook on new paintkits update');
+                }
+
+                log.error(err);
+            });
     }
 }
 
