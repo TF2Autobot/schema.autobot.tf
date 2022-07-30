@@ -422,7 +422,7 @@ class WebhookQueue {
                     this.isRateLimited = true;
 
                     this.isProcessing = false;
-                    this.execute();
+                    return this.execute();
                 }
 
                 this.isProcessing = false;
