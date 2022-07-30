@@ -178,10 +178,19 @@ export default class SchemaManager {
                         description:
                             '• ' +
                             newItems
-                                .map(
-                                    item =>
-                                        `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${item.defindex}): [${item.item_name}](https://autobot.tf/items/${item.defindex};6)`
-                                )
+                                .map(item => {
+                                    let number: string = null;
+                                    const withoutNumber = item.item_name.replace(/#\d+/, '');
+                                    if (item.item_name !== withoutNumber) {
+                                        number = item.item_name.substring(withoutNumber.length + 1).trim();
+                                    }
+
+                                    return `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${
+                                        item.defindex
+                                    }): [${item.item_name}](https://autobot.tf/items/${item.defindex};6${
+                                        number ? ';c' + number : ''
+                                    })`;
+                                })
                                 .join('\n• '),
                         color: '9171753' // Green
                     })
