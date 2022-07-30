@@ -4,6 +4,7 @@ import log from '../lib/logger';
 import { Webhook } from '../types/DiscordWebhook';
 import Redis from './Redis';
 import * as timersPromises from 'timers/promises';
+import filterAxiosError from '@tf2autobot/filter-axios-error';
 
 const itemGrade = new Map();
 itemGrade
@@ -361,7 +362,13 @@ class WebhookQueue {
     static enqueue(url: string, type: WebhookType, webhook: Webhook): void {
         this.webhooks.push({ url, type, webhook });
 
-        void this.process();
+        this.execute();
+    }
+
+    private static execute(): void {
+        void this.process().catch(err => {
+            // ignore
+        });
     }
 
     private static dequeue(): void {
@@ -372,6 +379,13 @@ class WebhookQueue {
         const webhook = this.webhooks[0];
 
         if (webhook === undefined || this.isProcessing === true) {
+            return;
+        }
+
+        // Check again before sending
+        const isAlreadySent = await Redis.getCache(`s_alreadySent${capitalizeFirstLetter(webhook.type)}UpdateWebhook`);
+
+        if (isAlreadySent === 'true') {
             return;
         }
 
@@ -390,26 +404,36 @@ class WebhookQueue {
             data: webhook.webhook
         })
             .then(() => {
-                if (webhook.type === 'items') {
-                    Redis.setCachex('s_alreadySentItemsUpdateWebhook', 10 * 60 * 1000, 'true');
-                } else if (webhook.type === 'effects') {
-                    Redis.setCachex('s_alreadySentEffectsUpdateWebhook', 10 * 60 * 1000, 'true');
-                } else if (webhook.type === 'paintkits') {
-                    Redis.setCachex('s_alreadySentPaintkitsUpdateWebhook', 10 * 60 * 1000, 'true');
-                }
+                Redis.setCachex(
+                    `s_alreadySent${capitalizeFirstLetter(webhook.type)}UpdateWebhook`,
+                    10 * 60 * 1000,
+                    'true'
+                );
+
+                this.isProcessing = false;
+                this.dequeue();
+                this.execute();
             })
             .catch(err => {
-                if (webhook.type === 'items') {
-                    log.warn('Error sending webhook on new items update');
-                } else if (webhook.type === 'effects') {
-                    log.warn('Error sending webhook on new effects update');
-                } else if (webhook.type === 'paintkits') {
-                    log.warn('Error sending webhook on new paintkits update');
+                log.warn(`Error sending webhook on new ${webhook.type} update`, filterAxiosError(err));
+
+                if (typeof err.data !== 'string' && err.data.message === 'The resource is being rate limited.') {
+                    this.sleepTime = err.data.retry_after;
+                    this.isRateLimited = true;
+
+                    this.isProcessing = false;
+                    this.execute();
                 }
 
-                log.error(err);
+                this.isProcessing = false;
+                this.dequeue();
+                this.execute();
             });
     }
+}
+
+function capitalizeFirstLetter(s: string) {
+    return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 interface ItemCollections {
