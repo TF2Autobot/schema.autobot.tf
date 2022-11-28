@@ -171,45 +171,7 @@ export default class SchemaManager {
             }
 
             if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
-                // reference: https://github.com/TF2Autobot/tf2autobot/blob/f14f74d44b3fa5417a5e2e2282016b5f7ec56923/src/classes/Commands/sub-classes/Manager.ts#L307-L321
-
-                const limit = 25;
-                const newItemsCount = newItems.length;
-
-                if (newItemsCount > limit) {
-                    const loops = Math.ceil(newItemsCount / limit);
-
-                    for (let i = 0; i < loops; i++) {
-                        const last = loops - i === 1;
-
-                        WebhookQueue.enqueue(
-                            process.env.ITEMS_UPDATE_WEBHOOK_URL,
-                            'items',
-                            constructWebhook({
-                                title: '__**New item(s) added**__',
-                                description:
-                                    '• ' +
-                                    newItems
-                                        .slice(i * limit, last ? newItemsCount : (i + 1) * limit)
-                                        .map(item => {
-                                            let number: string = null;
-                                            const withoutNumber = item.item_name.replace(/#\d+/, '');
-                                            if (item.item_name !== withoutNumber) {
-                                                number = item.item_name.substring(withoutNumber.length + 1).trim();
-                                            }
-
-                                            return `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${
-                                                item.defindex
-                                            }): [${item.item_name}](https://autobot.tf/items/${item.defindex};6${
-                                                number ? ';c' + number : ''
-                                            })`;
-                                        })
-                                        .join('\n• '),
-                                color: '9171753' // Green
-                            })
-                        );
-                    }
-                } else {
+                const enqueueWebhookFn = (newItemsArray: { defindex: string; item_name: string }[]) => {
                     WebhookQueue.enqueue(
                         process.env.ITEMS_UPDATE_WEBHOOK_URL,
                         'items',
@@ -217,7 +179,7 @@ export default class SchemaManager {
                             title: '__**New item(s) added**__',
                             description:
                                 '• ' +
-                                newItems
+                                newItemsArray
                                     .map(item => {
                                         let number: string = null;
                                         const withoutNumber = item.item_name.replace(/#\d+/, '');
@@ -235,6 +197,23 @@ export default class SchemaManager {
                             color: '9171753' // Green
                         })
                     );
+                };
+
+                // reference: https://github.com/TF2Autobot/tf2autobot/blob/f14f74d44b3fa5417a5e2e2282016b5f7ec56923/src/classes/Commands/sub-classes/Manager.ts#L307-L321
+
+                const limit = 25;
+                const newItemsCount = newItems.length;
+
+                if (newItemsCount > limit) {
+                    const loops = Math.ceil(newItemsCount / limit);
+
+                    for (let i = 0; i < loops; i++) {
+                        const last = loops - i === 1;
+
+                        enqueueWebhookFn(newItems.slice(i * limit, last ? newItemsCount : (i + 1) * limit));
+                    }
+                } else {
+                    enqueueWebhookFn(newItems);
                 }
             }
         }
