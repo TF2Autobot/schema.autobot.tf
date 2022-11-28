@@ -23,7 +23,7 @@
     },
     "homepage": "https://github.com/TF2Autobot/schema.autobot.tf#readme",
     "dependencies": {
-        "@fastify/swagger": "^7.4.0",
+        "@fastify/swagger": "^7.6.1",
         "@tf2autobot/filter-axios-error": "^1.3.1",
         "@tf2autobot/tf2-schema": "^4.1.2",
         "@tf2autobot/tf2-sku": "^2.0.3",
@@ -31,7 +31,7 @@
         "axios": "^0.27.2",
         "death": "^1.1.0",
         "dotenv": "^16.0.1",
-        "fastify": "^4.1.0",
+        "fastify": "^4.10.2",
         "isobject": "^4.0.0",
         "redis": "^4.1.1",
         "winston": "^3.8.0",
