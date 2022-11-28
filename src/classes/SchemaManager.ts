@@ -181,11 +181,7 @@ export default class SchemaManager {
                                 '• ' +
                                 newItemsArray
                                     .map(item => {
-                                        let number: string = null;
-                                        const withoutNumber = item.item_name.replace(/#\d+/, '');
-                                        if (item.item_name !== withoutNumber) {
-                                            number = item.item_name.substring(withoutNumber.length + 1).trim();
-                                        }
+                                        let number: string = this.schemaManager.schema.raw.items_game.items[item.defindex]?.static_attrs?.['set supply crate series'];
 
                                         return `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${
                                             item.defindex
