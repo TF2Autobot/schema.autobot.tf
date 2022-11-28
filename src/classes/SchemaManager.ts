@@ -417,7 +417,7 @@ class WebhookQueue {
             .catch(err => {
                 log.warn(`Error sending webhook on new ${webhook.type} update`, filterAxiosError(err));
 
-                if (typeof err.data !== 'string' && err.data.message === 'The resource is being rate limited.') {
+                if (typeof err.data !== 'string' && err.data?.message === 'The resource is being rate limited.') {
                     this.sleepTime = err.data.retry_after;
                     this.isRateLimited = true;
 
