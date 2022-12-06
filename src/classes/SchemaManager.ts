@@ -69,7 +69,7 @@ export default class SchemaManager {
                     if (process.env.LOAD_LOCAL_SCHEMA === 'true') {
                         const data = fs.readFileSync(path.join(__dirname, '../../schema.json'), { encoding: 'utf-8' });
                         // @ts-ignore
-                        this.schemaManager.setSchema(data);
+                        this.schemaManager.setSchema(JSON.parse(data));
                     }
                 }, 1 * 60 * 1000);
 
