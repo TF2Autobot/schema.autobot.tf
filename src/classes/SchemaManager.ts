@@ -5,6 +5,8 @@ import { Webhook } from '../types/DiscordWebhook';
 import Redis from './Redis';
 import * as timersPromises from 'timers/promises';
 import filterAxiosError from '@tf2autobot/filter-axios-error';
+import fs from 'fs';
+import path from 'path';
 
 const itemGrade = new Map();
 itemGrade
@@ -62,6 +64,12 @@ export default class SchemaManager {
                         log.error(err);
                     }
                 });
+
+                if (process.env.LOAD_LOCAL_SCHEMA === 'true') {
+                    const data = fs.readFileSync(path.join(__dirname, '../../schema.json'), { encoding: 'utf-8' });
+                    // @ts-ignore
+                    this.schemaManager.setSchema(data, true);
+                }
 
                 resolve();
             });
@@ -182,7 +190,10 @@ export default class SchemaManager {
                     for (let i = 0; i < loops; i++) {
                         const last = loops - i === 1;
 
-                        SchemaManager.enqueueWebhook(this.schemaManager, newItems.slice(i * limit, last ? newItemsCount : (i + 1) * limit));
+                        SchemaManager.enqueueWebhook(
+                            this.schemaManager,
+                            newItems.slice(i * limit, last ? newItemsCount : (i + 1) * limit)
+                        );
                     }
                 } else {
                     SchemaManager.enqueueWebhook(this.schemaManager, newItems);
@@ -193,7 +204,10 @@ export default class SchemaManager {
         this.oldDefindexes = this.defindexes;
     }
 
-    private static enqueueWebhook(schemaManager: SchemaTF2, newItemsArray: { defindex: string; item_name: string }[]): void {
+    private static enqueueWebhook(
+        schemaManager: SchemaTF2,
+        newItemsArray: { defindex: string; item_name: string }[]
+    ): void {
         WebhookQueue.enqueue(
             process.env.ITEMS_UPDATE_WEBHOOK_URL,
             'items',
@@ -203,7 +217,10 @@ export default class SchemaManager {
                     '• ' +
                     newItemsArray
                         .map(item => {
-                            let number: string = schemaManager.schema.raw.items_game.items[item.defindex]?.static_attrs?.['set supply crate series'];
+                            let number: string =
+                                schemaManager.schema.raw.items_game.items[item.defindex]?.static_attrs?.[
+                                    'set supply crate series'
+                                ];
 
                             return `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${
                                 item.defindex
@@ -215,7 +232,7 @@ export default class SchemaManager {
                 color: '9171753' // Green
             })
         );
-    };
+    }
 
     private static async checkNewEffects(): Promise<void> {
         if (this.oldEffects === undefined) {
