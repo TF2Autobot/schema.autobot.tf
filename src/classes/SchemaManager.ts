@@ -171,30 +171,6 @@ export default class SchemaManager {
             }
 
             if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
-                const enqueueWebhookFn = (newItemsArray: { defindex: string; item_name: string }[]) => {
-                    WebhookQueue.enqueue(
-                        process.env.ITEMS_UPDATE_WEBHOOK_URL,
-                        'items',
-                        constructWebhook({
-                            title: '__**New item(s) added**__',
-                            description:
-                                '• ' +
-                                newItemsArray
-                                    .map(item => {
-                                        let number: string = this.schemaManager.schema.raw.items_game.items[item.defindex]?.static_attrs?.['set supply crate series'];
-
-                                        return `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${
-                                            item.defindex
-                                        }): [${item.item_name}](https://autobot.tf/items/${item.defindex};6${
-                                            number ? ';c' + number : ''
-                                        })`;
-                                    })
-                                    .join('\n• '),
-                            color: '9171753' // Green
-                        })
-                    );
-                };
-
                 // reference: https://github.com/TF2Autobot/tf2autobot/blob/f14f74d44b3fa5417a5e2e2282016b5f7ec56923/src/classes/Commands/sub-classes/Manager.ts#L307-L321
 
                 const limit = 25;
@@ -206,16 +182,40 @@ export default class SchemaManager {
                     for (let i = 0; i < loops; i++) {
                         const last = loops - i === 1;
 
-                        enqueueWebhookFn(newItems.slice(i * limit, last ? newItemsCount : (i + 1) * limit));
+                        SchemaManager.enqueueWebhook(this.schemaManager, newItems.slice(i * limit, last ? newItemsCount : (i + 1) * limit));
                     }
                 } else {
-                    enqueueWebhookFn(newItems);
+                    SchemaManager.enqueueWebhook(this.schemaManager, newItems);
                 }
             }
         }
 
         this.oldDefindexes = this.defindexes;
     }
+
+    private static enqueueWebhook(schemaManager: SchemaTF2, newItemsArray: { defindex: string; item_name: string }[]): void {
+        WebhookQueue.enqueue(
+            process.env.ITEMS_UPDATE_WEBHOOK_URL,
+            'items',
+            constructWebhook({
+                title: '__**New item(s) added**__',
+                description:
+                    '• ' +
+                    newItemsArray
+                        .map(item => {
+                            let number: string = schemaManager.schema.raw.items_game.items[item.defindex]?.static_attrs?.['set supply crate series'];
+
+                            return `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${
+                                item.defindex
+                            }): [${item.item_name}](https://autobot.tf/items/${item.defindex};6${
+                                number ? ';c' + number : ''
+                            })`;
+                        })
+                        .join('\n• '),
+                color: '9171753' // Green
+            })
+        );
+    };
 
     private static async checkNewEffects(): Promise<void> {
         if (this.oldEffects === undefined) {
