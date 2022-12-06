@@ -179,7 +179,7 @@ export default class SchemaManager {
             });
 
             const alreadySent = await Redis.getCache('s_alreadySentItemsUpdateWebhook');
-            if (alreadySent === 'true') {
+            if (alreadySent === 'true' && process.env.DEBUGGING !== 'true') {
                 this.oldDefindexes = this.defindexes;
                 return;
             }
@@ -260,7 +260,7 @@ export default class SchemaManager {
             });
 
             const alreadySent = await Redis.getCache('s_alreadySentEffectsUpdateWebhook');
-            if (alreadySent === 'true') {
+            if (alreadySent === 'true' && process.env.DEBUGGING !== 'true') {
                 this.oldEffects = this.schemaManager.schema.effects;
                 return;
             }
@@ -326,7 +326,7 @@ export default class SchemaManager {
             });
 
             const alreadySent = await Redis.getCache('s_alreadySentPaintkitsUpdateWebhook');
-            if (alreadySent === 'true') {
+            if (alreadySent === 'true' && process.env.DEBUGGING !== 'true') {
                 this.oldPaintkits = this.schemaManager.schema.paintkits;
                 return;
             }
@@ -423,7 +423,7 @@ class WebhookQueue {
         // Check again before sending
         const isAlreadySent = await Redis.getCache(`s_alreadySent${capitalizeFirstLetter(webhook.type)}UpdateWebhook`);
 
-        if (isAlreadySent === 'true') {
+        if (isAlreadySent === 'true' && process.env.DEBUGGING !== 'true') {
             return;
         }
 

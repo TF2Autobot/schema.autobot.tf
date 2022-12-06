@@ -20,7 +20,8 @@
                 "REDIS_PASSWORD": "",
 
                 "ITEMS_UPDATE_WEBHOOK_URL": "",
-                "LOAD_LOCAL_SCHEMA": false
+                "LOAD_LOCAL_SCHEMA": false,
+                "DEBUGGING": false
             }
         }
     ]
