@@ -71,6 +71,9 @@ export default class SchemaManager {
                         // @ts-ignore
                         this.schemaManager.setSchema(JSON.parse(data));
                         this.setProperties();
+                        this.oldDefindexes = this.defindexes;
+                        this.oldEffects = this.schemaManager.schema.effects;
+                        this.oldPaintkits = this.schemaManager.schema.paintkits;
                     }
                 }, 1 * 60 * 1000);
 
