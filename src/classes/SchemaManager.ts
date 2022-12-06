@@ -65,11 +65,13 @@ export default class SchemaManager {
                     }
                 });
 
-                if (process.env.LOAD_LOCAL_SCHEMA === 'true') {
-                    const data = fs.readFileSync(path.join(__dirname, '../../schema.json'), { encoding: 'utf-8' });
-                    // @ts-ignore
-                    this.schemaManager.setSchema(data, true);
-                }
+                setTimeout(() => {
+                    if (process.env.LOAD_LOCAL_SCHEMA === 'true') {
+                        const data = fs.readFileSync(path.join(__dirname, '../../schema.json'), { encoding: 'utf-8' });
+                        // @ts-ignore
+                        this.schemaManager.setSchema(data, true);
+                    }
+                }, 1 * 60 * 1000);
 
                 resolve();
             });
