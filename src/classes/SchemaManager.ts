@@ -70,6 +70,7 @@ export default class SchemaManager {
                         const data = fs.readFileSync(path.join(__dirname, '../../schema.json'), { encoding: 'utf-8' });
                         // @ts-ignore
                         this.schemaManager.setSchema(JSON.parse(data));
+                        this.setProperties();
                     }
                 }, 1 * 60 * 1000);
 
