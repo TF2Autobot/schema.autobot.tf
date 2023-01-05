@@ -25,7 +25,7 @@
     "dependencies": {
         "@fastify/swagger": "^7.6.1",
         "@tf2autobot/filter-axios-error": "^1.5.1",
-        "@tf2autobot/tf2-schema": "^4.2.7",
+        "@tf2autobot/tf2-schema": "^4.2.8",
         "@tf2autobot/tf2-sku": "^2.0.3",
         "@types/death": "^1.1.2",
         "axios": "^0.27.2",
