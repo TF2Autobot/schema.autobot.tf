@@ -2,7 +2,6 @@ import SchemaTF2 from '@tf2autobot/tf2-schema';
 import axios from 'axios';
 import log from '../lib/logger';
 import { Webhook } from '../types/DiscordWebhook';
-import Redis from './Redis';
 import * as timersPromises from 'timers/promises';
 import filterAxiosError from '@tf2autobot/filter-axios-error';
 import fs from 'fs';
@@ -178,12 +177,6 @@ export default class SchemaManager {
                 }
             });
 
-            const alreadySent = await Redis.getCache('s_alreadySentItemsUpdateWebhook');
-            if (alreadySent === 'true' && process.env.DEBUGGING !== 'true') {
-                this.oldDefindexes = this.defindexes;
-                return;
-            }
-
             if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
                 // reference: https://github.com/TF2Autobot/tf2autobot/blob/f14f74d44b3fa5417a5e2e2282016b5f7ec56923/src/classes/Commands/sub-classes/Manager.ts#L307-L321
 
@@ -259,12 +252,6 @@ export default class SchemaManager {
                 }
             });
 
-            const alreadySent = await Redis.getCache('s_alreadySentEffectsUpdateWebhook');
-            if (alreadySent === 'true' && process.env.DEBUGGING !== 'true') {
-                this.oldEffects = this.schemaManager.schema.effects;
-                return;
-            }
-
             if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
                 // just use the same link
 
@@ -325,12 +312,6 @@ export default class SchemaManager {
                 }
             });
 
-            const alreadySent = await Redis.getCache('s_alreadySentPaintkitsUpdateWebhook');
-            if (alreadySent === 'true' && process.env.DEBUGGING !== 'true') {
-                this.oldPaintkits = this.schemaManager.schema.paintkits;
-                return;
-            }
-
             if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
                 // just use the same link
 
@@ -386,7 +367,7 @@ function constructWebhook({
     };
 }
 
-type WebhookType = 'items' | 'effects' | 'paintkits';
+type WebhookType = 'items' | 'effects' | 'paintkits' | 'skus';
 
 class WebhookQueue {
     private static webhooks: { url: string; type: WebhookType; webhook: Webhook }[] = [];
@@ -420,13 +401,6 @@ class WebhookQueue {
             return;
         }
 
-        // Check again before sending
-        const isAlreadySent = await Redis.getCache(`s_alreadySent${capitalizeFirstLetter(webhook.type)}UpdateWebhook`);
-
-        if (isAlreadySent === 'true' && process.env.DEBUGGING !== 'true') {
-            return;
-        }
-
         this.isProcessing = true;
 
         await timersPromises.setTimeout(this.sleepTime);
@@ -442,12 +416,6 @@ class WebhookQueue {
             data: webhook.webhook
         })
             .then(() => {
-                Redis.setCachex(
-                    `s_alreadySent${capitalizeFirstLetter(webhook.type)}UpdateWebhook`,
-                    10 * 60 * 1000,
-                    'true'
-                );
-
                 this.isProcessing = false;
                 this.dequeue();
                 this.execute();
