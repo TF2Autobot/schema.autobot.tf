@@ -177,7 +177,7 @@ export default class SchemaManager {
                 }
             });
 
-            if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
+            if (process.env.ITEMS_UPDATE_WEBHOOK_URL !== '') {
                 // reference: https://github.com/TF2Autobot/tf2autobot/blob/f14f74d44b3fa5417a5e2e2282016b5f7ec56923/src/classes/Commands/sub-classes/Manager.ts#L307-L321
 
                 const limit = 25;
@@ -252,7 +252,7 @@ export default class SchemaManager {
                 }
             });
 
-            if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
+            if (process.env.ITEMS_UPDATE_WEBHOOK_URL !== '') {
                 // just use the same link
 
                 WebhookQueue.enqueue(
@@ -312,7 +312,7 @@ export default class SchemaManager {
                 }
             });
 
-            if (process.env.ITEMS_UPDATE_WEBHOOK_URL) {
+            if (process.env.ITEMS_UPDATE_WEBHOOK_URL !== '') {
                 // just use the same link
 
                 WebhookQueue.enqueue(
