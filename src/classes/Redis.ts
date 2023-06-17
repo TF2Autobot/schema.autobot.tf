@@ -46,7 +46,7 @@ export default class Redis {
         return await this.client.GET(key);
     }
 
-    static async shutdown(): Promise<void> {
+    static async shutdown(): Promise<string> {
         if (this.client) {
             return await this.client.quit();
         }
