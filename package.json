@@ -24,7 +24,7 @@
     "homepage": "https://github.com/TF2Autobot/schema.autobot.tf#readme",
     "dependencies": {
         "@fastify/swagger": "^7.6.1",
-        "@tf2autobot/filter-axios-error": "^1.5.1",
+        "@tf2autobot/filter-axios-error": "^1.5.3",
         "@tf2autobot/tf2-schema": "^4.4.1",
         "@tf2autobot/tf2-sku": "^2.0.4",
         "@types/death": "^1.1.2",
