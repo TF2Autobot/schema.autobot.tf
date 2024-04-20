@@ -207,30 +207,32 @@ export default class SchemaManager {
         schemaManager: SchemaTF2,
         newItemsArray: { defindex: string; item_name: string }[]
     ): void {
-        WebhookQueue.enqueue(
-            process.env.ITEMS_UPDATE_WEBHOOK_URL,
-            'items',
-            constructWebhook({
-                title: '__**New item(s) added**__',
-                description:
-                    '• ' +
-                    newItemsArray
-                        .map(item => {
-                            let number: string =
-                                schemaManager.schema.raw.items_game.items[item.defindex]?.static_attrs?.[
-                                    'set supply crate series'
-                                ];
+        if (process.env.ITEMS_UPDATE_WEBHOOK_URL !== '') {
+            WebhookQueue.enqueue(
+                process.env.ITEMS_UPDATE_WEBHOOK_URL,
+                'items',
+                constructWebhook({
+                    title: '__**New item(s) added**__',
+                    description:
+                        '• ' +
+                        newItemsArray
+                            .map(item => {
+                                let number: string =
+                                    schemaManager.schema.raw.items_game.items[item.defindex]?.static_attrs?.[
+                                        'set supply crate series'
+                                    ];
 
-                            return `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${
-                                item.defindex
-                            }): [${item.item_name}](https://autobot.tf/items/${item.defindex};6${
-                                number ? ';c' + number : ''
-                            })`;
-                        })
-                        .join('\n• '),
-                color: '9171753' // Green
-            })
-        );
+                                return `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${
+                                    item.defindex
+                                }): [${item.item_name}](https://autobot.tf/items/${item.defindex};6${
+                                    number ? ';c' + number : ''
+                                })`;
+                            })
+                            .join('\n• '),
+                    color: '9171753' // Green
+                })
+            );
+        }
     }
 
     private static async checkNewEffects(): Promise<void> {
