@@ -412,7 +412,7 @@ class WebhookQueue {
             this.isRateLimited = false;
         }
 
-        void axios({
+        axios({
             method: 'POST',
             url: webhook.url,
             data: webhook.webhook
