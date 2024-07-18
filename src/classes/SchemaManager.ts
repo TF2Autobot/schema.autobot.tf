@@ -423,7 +423,7 @@ class WebhookQueue {
                 this.execute();
             })
             .catch(err => {
-                log.warn(`Error sending webhook on new ${webhook.type} update`, filterAxiosError(err));
+                log.warn(`Error sending webhook on new ${webhook.type} update: `, err.message);
 
                 if (err.status === 429) {
                     this.sleepTime = 10000;
