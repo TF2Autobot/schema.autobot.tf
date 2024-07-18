@@ -1,7 +1,7 @@
 {
     "name": "schema.autobot.tf",
     "description": "A server that handles request related to Team Fortress 2 schema",
-    "version": "2.10.10",
+    "version": "2.10.11",
     "main": "./dist/app.js",
     "scripts": {
         "build": "tsc -p ."
