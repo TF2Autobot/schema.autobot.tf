@@ -3,7 +3,6 @@ import axios from 'axios';
 import log from '../lib/logger';
 import { Webhook } from '../types/DiscordWebhook';
 import * as timersPromises from 'timers/promises';
-import filterAxiosError from '@tf2autobot/filter-axios-error';
 import fs from 'fs';
 import path from 'path';
 
@@ -41,7 +40,7 @@ export default class SchemaManager {
         return new Promise((resolve, reject) => {
             this.schemaManager = new SchemaTF2({
                 apiKey: process.env.STEAM_API_KEY,
-                updateTime: 5 * 60 * 1000
+                updateTime: 2 * 60 * 1000
             });
 
             this.schemaManager.init(err => {
@@ -353,7 +352,7 @@ function constructWebhook({
     description: string;
     color: string;
 }): Webhook {
-    return {
+    const toReturn = {
         username: 'Schema.autobot.tf',
         avatar_url: 'https://autobot.tf/images/tf2autobot.png',
         embeds: [
@@ -367,6 +366,8 @@ function constructWebhook({
             }
         ]
     };
+    log.debug('discord: ', toReturn);
+    return toReturn;
 }
 
 type WebhookType = 'items' | 'effects' | 'paintkits' | 'skus';
