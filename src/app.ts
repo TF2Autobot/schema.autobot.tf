@@ -17,7 +17,6 @@ fastifySetup(server);
 
 import ON_DEATH from 'death';
 import { inspect } from 'util';
-import Redis from './classes/Redis';
 
 ON_DEATH({ uncaughtException: true })(async (signalOrErr, origin) => {
     const crashed = signalOrErr !== 'SIGINT';
@@ -42,7 +41,6 @@ ON_DEATH({ uncaughtException: true })(async (signalOrErr, origin) => {
     clearTimeout(SchemaManager?.schemaManager?._updateTimeout);
 
     if (server) {
-        await Redis.shutdown();
         await server.close();
     }
 

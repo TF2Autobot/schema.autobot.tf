@@ -14,7 +14,6 @@ import raw from './routes/raw/index';
 import root from './routes/index';
 import itemObjectProperties from './schemas/itemObject';
 import econItemProperties from './schemas/econItem';
-import Redis from './classes/Redis';
 
 export default async function fastifySetup(server: FastifyInstance): Promise<void> {
     // @ts-ignore
@@ -38,8 +37,6 @@ export default async function fastifySetup(server: FastifyInstance): Promise<voi
         log.debug('Initiaziling schema manager...');
         await SchemaManager.init();
 
-        log.debug('Initiaziling Redis db...');
-        await Redis.init();
     } catch (err) {
         throw err;
     }

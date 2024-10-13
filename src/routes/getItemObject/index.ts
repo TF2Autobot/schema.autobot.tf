@@ -2,7 +2,6 @@ import { FastifyInstance, FastifyPluginAsync, RegisterOptions } from 'fastify';
 import SchemaManager from '../../classes/SchemaManager';
 import { Item } from '@tf2autobot/tf2-schema';
 import SKU from '@tf2autobot/tf2-sku';
-import Redis from '../../classes/Redis';
 import { EconItem } from '../../types/EconItem';
 import parseEcon from '../../lib/econParser/parseEcon';
 import { multiple1, multiple2, single1, single2 } from '../../lib/examples/econ';
@@ -33,24 +32,14 @@ const getItemObject: FastifyPluginAsync = async (app: FastifyInstance, opts?: Re
 
             // @ts-ignore
             const name = req.params.name as string;
-
-            const skuCached = await Redis.getCache(`s_gsfn_${name}`);
             let itemObject: Item;
-            if (skuCached) {
-                itemObject = SKU.fromString(skuCached);
-            } else {
-                itemObject = SchemaManager.schemaManager.schema.getItemObjectFromName(name);
-            }
+            itemObject = SchemaManager.schemaManager.schema.getItemObjectFromName(name);
 
             if (itemObject.defindex === null || itemObject.quality === null) {
                 return reply.code(404).header('Content-Type', 'application/json; charset=utf-8').send({
                     success: false,
                     message: `Generated itemObject contains defindex or quality of null - Please check the item name you've sent`
                 });
-            }
-
-            if (!skuCached) {
-                Redis.setCache(`s_gsfn_${name}`, SKU.fromObject(itemObject));
             }
 
             return reply
@@ -94,18 +83,8 @@ const getItemObject: FastifyPluginAsync = async (app: FastifyInstance, opts?: Re
             const itemObjects: Item[] = [];
 
             for (const name of names) {
-                const skuCached = await Redis.getCache(`s_gsfn_${name}`);
-
-                if (skuCached) {
-                    itemObjects.push(SKU.fromString(skuCached));
-                } else {
-                    const itemObject = SchemaManager.schemaManager.schema.getItemObjectFromName(name);
-                    itemObjects.push(itemObject);
-
-                    if (itemObject.defindex !== null && itemObject.quality !== null) {
-                        Redis.setCache(`s_gsfn_${name}`, SKU.fromObject(itemObject));
-                    }
-                }
+                const itemObject = SchemaManager.schemaManager.schema.getItemObjectFromName(name);
+                itemObjects.push(itemObject);
             }
 
             return reply

@@ -1,7 +1,6 @@
 import { FastifyInstance, FastifyPluginAsync, RegisterOptions } from 'fastify';
 import SchemaManager from '../../classes/SchemaManager';
 import log from '../../lib/logger';
-import Redis from '../../classes/Redis';
 
 const schema: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOptions): Promise<void> => {
     app.get(
@@ -49,43 +48,6 @@ const schema: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
             }
         },
         async (req, reply) => {
-            if (process.env.DEBUGGING !== 'true') {
-                const executedRefreshSchema = JSON.parse(await Redis.getCache('s_executedRefreshSchema'));
-
-                if (executedRefreshSchema === null) {
-                    Redis.setCachex('s_executedRefreshSchema', timeoutTime, 'false');
-                    lastExecutedRefreshSchemaTime = null;
-                    Redis.setCachex('s_lastExecutedRefreshSchemaTime', timeoutTime, 'null');
-                } else {
-                    lastExecutedRefreshSchemaTime = JSON.parse(await Redis.getCache('s_lastExecutedRefreshSchemaTime'));
-                }
-
-                const newExecutedTime = Date.now();
-                const timeDiff = newExecutedTime - lastExecutedRefreshSchemaTime;
-
-                if (executedRefreshSchema) {
-                    return reply
-                        .code(429)
-                        .header('Content-Type', 'application/json; charset=utf-8')
-                        .send({
-                            success: false,
-                            message: 'This has already been called in the last 30 minutes',
-                            'retry-after': timeoutTime - timeDiff
-                        });
-                }
-
-                clearTimeout(executeRefreshSchemaTimeout);
-                lastExecutedRefreshSchemaTime = Date.now();
-                Redis.setCachex('s_lastExecutedRefreshSchemaTime', timeoutTime, String(lastExecutedRefreshSchemaTime));
-                Redis.setCachex('s_executedRefreshSchema', timeoutTime, 'true');
-
-                executeRefreshSchemaTimeout = setTimeout(() => {
-                    Redis.setCachex('s_lastExecutedRefreshSchemaTime', timeoutTime, 'null');
-                    Redis.setCachex('s_executedRefreshSchema', timeoutTime, 'false');
-                    clearTimeout(executeRefreshSchemaTimeout);
-                }, timeoutTime);
-            }
-
             SchemaManager.schemaManager.getSchema(err => {
                 if (err) {
                     log.error(err);

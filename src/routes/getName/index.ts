@@ -2,7 +2,6 @@ import { FastifyInstance, FastifyPluginAsync, RegisterOptions } from 'fastify';
 import SchemaManager from '../../classes/SchemaManager';
 import { Item } from '@tf2autobot/tf2-schema';
 import SKU from '@tf2autobot/tf2-sku';
-import Redis from '../../classes/Redis';
 
 const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOptions): Promise<void> => {
     app.post(
@@ -157,18 +156,6 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
                 usePipeForSkin?: boolean;
             };
 
-            // gnfs - getName/FromSku
-            const itemNameCached = await Redis.getCache(
-                `s_gnfs_${query.proper ? 'proper_' : ''}${query.usePipeForSkin ? 'pipe_' : ''}${sku}`
-            );
-
-            if (itemNameCached) {
-                return reply
-                    .code(200)
-                    .header('Content-Type', 'application/json; charset=utf-8')
-                    .send({ success: true, name: itemNameCached });
-            }
-
             const itemName = SchemaManager.schemaManager.schema.getName(
                 SKU.fromString(sku),
                 query?.proper ?? false,
@@ -181,8 +168,6 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
                     message: `Item name returned null`
                 });
             }
-
-            Redis.setCache(`s_gnfs_${query.proper ? 'proper_' : ''}${query.usePipeForSkin ? 'pipe_' : ''}${sku}`, itemName);
 
             return reply
                 .code(200)
@@ -237,27 +222,12 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
             const itemNames: string[] = [];
 
             for (const sku of skus) {
-                const itemNameCached = await Redis.getCache(
-                    `s_gnfs_${query.proper ? 'proper_' : ''}${query.usePipeForSkin ? 'pipe_' : ''}${sku}`
+                const itemName = SchemaManager.schemaManager.schema.getName(
+                    SKU.fromString(sku),
+                    query?.proper ?? false,
+                    query?.usePipeForSkin ?? false
                 );
-
-                if (itemNameCached) {
-                    itemNames.push(itemNameCached);
-                } else {
-                    const itemName = SchemaManager.schemaManager.schema.getName(
-                        SKU.fromString(sku),
-                        query?.proper ?? false,
-                        query?.usePipeForSkin ?? false
-                    );
-                    itemNames.push(itemName);
-
-                    if (itemName !== null) {
-                        Redis.setCache(
-                            `s_gnfs_${query.proper ? 'proper_' : ''}${query.usePipeForSkin ? 'pipe_' : ''}${sku}`,
-                            itemName
-                        );
-                    }
-                }
+                itemNames.push(itemName);
             }
 
             return reply

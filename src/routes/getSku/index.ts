@@ -2,7 +2,6 @@ import { FastifyInstance, FastifyPluginAsync, FastifySchema, RegisterOptions } f
 import SchemaManager from '../../classes/SchemaManager';
 import { Item } from '@tf2autobot/tf2-schema';
 import SKU from '@tf2autobot/tf2-sku';
-import Redis from '../../classes/Redis';
 import { EconItem } from '../../types/EconItem';
 import parseEcon from '../../lib/econParser/parseEcon';
 import { multiple1, multiple2, single1, single2 } from '../../lib/examples/econ';
@@ -104,15 +103,6 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
         async (req, reply) => {
             // @ts-ignore
             const name = req.params.name as string;
-            // gsfn - getSku/fromName
-            const skuCached = await Redis.getCache(`s_gsfn_${name}`);
-
-            if (skuCached) {
-                return reply
-                    .code(200)
-                    .header('Content-Type', 'application/json; charset=utf-8')
-                    .send({ success: true, sku: skuCached });
-            }
 
             const sku = SchemaManager.schemaManager.schema.getSkuFromName(name);
 
@@ -126,7 +116,6 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
                     });
             }
 
-            Redis.setCache(`s_gsfn_${name}`, sku);
             return reply
                 .code(200)
                 .header('Content-Type', 'application/json; charset=utf-8')
@@ -168,18 +157,8 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
             const skus: string[] = [];
 
             for (const name of names) {
-                const skuCached = await Redis.getCache(`s_gsfn_${name}`);
-
-                if (skuCached) {
-                    skus.push(skuCached);
-                } else {
-                    const sku = SchemaManager.schemaManager.schema.getSkuFromName(name);
+                const sku = SchemaManager.schemaManager.schema.getSkuFromName(name);
                     skus.push(sku);
-
-                    if (!sku.includes(';null') && !sku.includes(';undefined')) {
-                        Redis.setCache(`s_gsfn_${name}`, sku);
-                    }
-                }
             }
 
             return reply

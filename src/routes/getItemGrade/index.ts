@@ -1,7 +1,6 @@
 import { FastifyInstance, FastifyPluginAsync, RegisterOptions } from 'fastify';
 import SchemaManager from '../../classes/SchemaManager';
 import SKU from '@tf2autobot/tf2-sku';
-import Redis from '../../classes/Redis';
 import { Item } from '@tf2autobot/tf2-schema';
 
 const getItemGrade: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOptions): Promise<void> => {
@@ -99,14 +98,8 @@ const getItemGrade: FastifyPluginAsync = async (app: FastifyInstance, opts?: Reg
             // @ts-ignore
             const name = req.params.name as string;
 
-            const skuCached = await Redis.getCache(`s_gsfn_${name}`);
-
             let itemObject: Item;
-            if (skuCached) {
-                itemObject = SKU.fromString(skuCached);
-            } else {
-                itemObject = SchemaManager.schemaManager.schema.getItemObjectFromName(name);
-            }
+            itemObject = SchemaManager.schemaManager.schema.getItemObjectFromName(name);
 
             if (itemObject.defindex === null) {
                 return reply.code(404).header('Content-Type', 'application/json; charset=utf-8').send({
@@ -120,10 +113,6 @@ const getItemGrade: FastifyPluginAsync = async (app: FastifyInstance, opts?: Reg
                     success: false,
                     message: `Item not found`
                 });
-            }
-
-            if (!skuCached) {
-                Redis.setCache(`s_gsfn_${name}`, SKU.fromObject(itemObject));
             }
 
             return reply
