@@ -33,7 +33,7 @@
         "dotenv": "^16.5.0",
         "fastify": "^4.28.1",
         "isobject": "^4.0.0",
-        "winston": "^3.16.0",
+        "winston": "^3.17.0",
         "winston-daily-rotate-file": "^4.7.1"
     },
     "devDependencies": {
