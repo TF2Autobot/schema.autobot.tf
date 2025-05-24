@@ -28,7 +28,7 @@
         "@tf2autobot/tf2-schema": "^4.5.2",
         "@tf2autobot/tf2-sku": "^2.0.4",
         "@types/death": "^1.1.5",
-        "axios": "^1.7.7",
+        "axios": "^1.9.0",
         "death": "^1.1.0",
         "dotenv": "^16.4.5",
         "fastify": "^4.28.1",
