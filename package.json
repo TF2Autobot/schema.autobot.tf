@@ -37,7 +37,7 @@
         "winston-daily-rotate-file": "^4.7.1"
     },
     "devDependencies": {
-        "@types/node": "^18.19.103",
+        "@types/node": "^18.19.130",
         "typescript": "^5.8.3"
     }
 }
