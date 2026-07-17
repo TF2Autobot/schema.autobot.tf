@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "baseUrl": ".",
+        "paths": {"*": ["./*"]},
         "module": "NodeNext",
         "allowJs": false,
         "checkJs": false,
