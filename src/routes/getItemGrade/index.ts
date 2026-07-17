@@ -43,9 +43,12 @@ const getItemGrade: FastifyPluginAsync = async (app: FastifyInstance, opts?: Reg
                 description: 'Get an item grade from item defindex',
                 tags: ['Get item grade'],
                 params: {
-                    defindex: {
-                        type: 'number',
-                        description: `Example: 15013, 30768`
+                    type: 'object',
+                    properties: {
+                        defindex: {
+                            type: 'number',
+                            description: `Example: 15013, 30768`
+                        }
                     }
                 }
             }
@@ -79,9 +82,12 @@ const getItemGrade: FastifyPluginAsync = async (app: FastifyInstance, opts?: Reg
                 description: 'Get an item grade from item full name',
                 tags: ['Get item grade'],
                 params: {
-                    name: {
-                        type: 'string',
-                        description: `Example: "Dead Head", "Giger Counter"`
+                    type: 'object',
+                    properties: {
+                        name: {
+                            type: 'string',
+                            description: `Example: "Dead Head", "Giger Counter"`
+                        }
                     }
                 }
             }
@@ -132,9 +138,12 @@ const getItemGrade: FastifyPluginAsync = async (app: FastifyInstance, opts?: Reg
                 description: 'Get an item grade from item sku',
                 tags: ['Get item grade'],
                 params: {
-                    sku: {
-                        type: 'string',
-                        description: `Example: "30693;6", "30648;5;u108"`
+                    type: 'object',
+                    properties: {
+                        sku: {
+                            type: 'string',
+                            description: `Example: "30693;6", "30648;5;u108"`
+                        }
                     }
                 }
             }

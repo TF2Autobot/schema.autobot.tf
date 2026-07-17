@@ -206,9 +206,12 @@ const properties: FastifyPluginAsync = async (app: FastifyInstance, opts?: Regis
                 description: 'Get an array of Team Fortress 2 Craftable Weapons (for trading) by Character class',
                 tags: ['Schema Properties (simplified)'],
                 params: {
-                    classChar: {
-                        type: 'string',
-                        enum: charClass
+                    type: 'object',
+                    properties: {
+                        classChar: {
+                            type: 'string',
+                            enum: charClass
+                        }
                     }
                 }
             }

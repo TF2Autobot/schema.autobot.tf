@@ -141,9 +141,12 @@ const getName: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
                     }
                 },
                 params: {
-                    sku: {
-                        type: 'string',
-                        description: `Example: "5021;6", "30769;5;u108"`
+                    type: 'object',
+                    properties: {
+                        sku: {
+                            type: 'string',
+                            description: `Example: "5021;6", "30769;5;u108"`
+                        }
                     }
                 }
             }

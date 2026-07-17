@@ -11,9 +11,12 @@ const getItem: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
                 description: 'Get an item element from item defindex',
                 tags: ['Get item element'],
                 params: {
-                    defindex: {
-                        type: 'number',
-                        description: `Example: 5021, 30769`
+                    type: 'object',
+                    properties: {
+                        defindex: {
+                            type: 'number',
+                            description: `Example: 5021, 30769`
+                        }
                     }
                 }
             }
@@ -59,9 +62,12 @@ const getItem: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
                 description: 'Get an item element from item full name',
                 tags: ['Get item element'],
                 params: {
-                    name: {
-                        type: 'string',
-                        description: `Example: "Mann Co. Supply Crate Key", "Tesla Coil Herald's Helm"`
+                    type: 'object',
+                    properties: {
+                        name: {
+                            type: 'string',
+                            description: `Example: "Mann Co. Supply Crate Key", "Tesla Coil Herald's Helm"`
+                        }
                     }
                 }
             }
@@ -115,9 +121,12 @@ const getItem: FastifyPluginAsync = async (app: FastifyInstance, opts?: Register
                 description: 'Get an item element from item sku',
                 tags: ['Get item element'],
                 params: {
-                    sku: {
-                        type: 'string',
-                        description: `Example: "5021;6", "30769;5;u108"`
+                    type: 'object',
+                    properties: {
+                        sku: {
+                            type: 'string',
+                            description: `Example: "5021;6", "30769;5;u108"`
+                        }
                     }
                 }
             }

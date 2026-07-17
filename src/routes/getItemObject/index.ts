@@ -14,9 +14,12 @@ const getItemObject: FastifyPluginAsync = async (app: FastifyInstance, opts?: Re
                 description: 'Get an item object from item full name',
                 tags: ['Get item object'],
                 params: {
-                    name: {
-                        type: 'string',
-                        description: `Example: "Mann Co. Supply Crate Key", "Tesla Coil Herald's Helm"`
+                    type: 'object',
+                    properties: {
+                        name: {
+                            type: 'string',
+                            description: `Example: "Mann Co. Supply Crate Key", "Tesla Coil Herald's Helm"`
+                        }
                     }
                 }
             }
@@ -101,9 +104,12 @@ const getItemObject: FastifyPluginAsync = async (app: FastifyInstance, opts?: Re
                 description: 'Get an item object from item sku',
                 tags: ['Get item object'],
                 params: {
-                    sku: {
-                        type: 'string',
-                        description: `Example: "5021;6", "30769;5;u108"`
+                    type: 'object',
+                    properties: {
+                        sku: {
+                            type: 'string',
+                            description: `Example: "5021;6", "30769;5;u108"`
+                        }
                     }
                 }
             }

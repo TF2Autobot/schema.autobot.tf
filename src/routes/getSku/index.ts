@@ -93,9 +93,12 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
                 description: 'Get an item sku from item full name',
                 tags: ['Get item sku'],
                 params: {
-                    name: {
-                        type: 'string',
-                        description: `Example: "Mann Co. Supply Crate Key", "Tesla Coil Herald's Helm"`
+                    type: 'object',
+                    properties: {
+                        name: {
+                            type: 'string',
+                            description: `Example: "Mann Co. Supply Crate Key", "Tesla Coil Herald's Helm"`
+                        }
                     }
                 }
             }
@@ -158,7 +161,7 @@ const getSku: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterO
 
             for (const name of names) {
                 const sku = SchemaManager.schemaManager.schema.getSkuFromName(name);
-                    skus.push(sku);
+                skus.push(sku);
             }
 
             return reply

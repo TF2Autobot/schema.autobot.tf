@@ -9,9 +9,12 @@ const raw: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOpti
                 description: 'Raw value for "raw.schema[key]"',
                 tags: ['Schema (raw)'],
                 params: {
-                    key: {
-                        type: 'string',
-                        enum: Object.keys(SchemaManager.schemaManager.schema.raw.schema)
+                    type: 'object',
+                    properties: {
+                        key: {
+                            type: 'string',
+                            enum: Object.keys(SchemaManager.schemaManager.schema.raw.schema)
+                        }
                     }
                 }
             }
@@ -53,9 +56,12 @@ const raw: FastifyPluginAsync = async (app: FastifyInstance, opts?: RegisterOpti
                 description: 'Raw value for "raw.items_game[key]"',
                 tags: ['Schema (raw)'],
                 params: {
-                    key: {
-                        type: 'string',
-                        enum: Object.keys(SchemaManager.schemaManager.schema.raw.items_game)
+                    type: 'object',
+                    properties: {
+                        key: {
+                            type: 'string',
+                            enum: Object.keys(SchemaManager.schemaManager.schema.raw.items_game)
+                        }
                     }
                 }
             }

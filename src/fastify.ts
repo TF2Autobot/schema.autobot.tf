@@ -1,6 +1,7 @@
 import SchemaManager from './classes/SchemaManager';
 import log from './lib/logger';
 import fastifySwagger from '@fastify/swagger';
+import fastifySwaggerUi from '@fastify/swagger-ui';
 import { FastifyInstance } from 'fastify';
 
 import schema from './routes/schema/index';
@@ -17,9 +18,7 @@ import econItemProperties from './schemas/econItem';
 
 export default async function fastifySetup(server: FastifyInstance): Promise<void> {
     // @ts-ignore
-    server.register(fastifySwagger, {
-        exposeRoute: true,
-        routePrefix: '/docs',
+    await server.register(fastifySwagger, {
         openapi: {
             info: {
                 title: 'Team Fortress 2 Schema Public Unofficial APIs',
@@ -33,10 +32,17 @@ export default async function fastifySetup(server: FastifyInstance): Promise<voi
         }
     });
 
+    await server.register(fastifySwaggerUi, {
+        routePrefix: '/docs',
+        uiConfig: {
+            docExpansion: 'list',
+            deepLinking: false
+        }
+    });
+
     try {
         log.debug('Initiaziling schema manager...');
         await SchemaManager.init();
-
     } catch (err) {
         throw err;
     }
