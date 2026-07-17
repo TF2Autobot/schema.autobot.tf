@@ -24,11 +24,9 @@
     "homepage": "https://github.com/TF2Autobot/schema.autobot.tf#readme",
     "dependencies": {
         "@fastify/swagger": "^7.6.1",
-        "@tf2autobot/filter-axios-error": "^1.5.6",
-        "@tf2autobot/tf2-schema": "^4.6.1",
+        "@tf2autobot/tf2-schema": "^4.7.0",
         "@tf2autobot/tf2-sku": "^2.0.4",
         "@types/death": "^1.1.5",
-        "axios": "^1.18.1",
         "death": "^1.1.0",
         "dotenv": "^16.6.1",
         "fastify": "^4.29.1",
@@ -39,5 +37,8 @@
     "devDependencies": {
         "@types/node": "^18.19.130",
         "typescript": "^5.8.3"
-    }
+    },
+	"engines": {
+		"node": ">=22.x"
+	}
 }

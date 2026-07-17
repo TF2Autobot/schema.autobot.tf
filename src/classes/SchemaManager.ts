@@ -1,5 +1,4 @@
 import SchemaTF2 from '@tf2autobot/tf2-schema';
-import axios from 'axios';
 import log from '../lib/logger';
 import { Webhook } from '../types/DiscordWebhook';
 import * as timersPromises from 'timers/promises';
@@ -63,17 +62,22 @@ export default class SchemaManager {
                     }
                 });
 
-                setTimeout(() => {
-                    if (process.env.LOAD_LOCAL_SCHEMA === 'true') {
-                        const data = fs.readFileSync(path.join(__dirname, '../../schema.json'), { encoding: 'utf-8' });
-                        // @ts-ignore
-                        this.schemaManager.setSchema(JSON.parse(data));
-                        this.setProperties();
-                        this.oldDefindexes = this.defindexes;
-                        this.oldEffects = this.schemaManager.schema.effects;
-                        this.oldPaintkits = this.schemaManager.schema.paintkits;
-                    }
-                }, 1 * 60 * 1000);
+                setTimeout(
+                    () => {
+                        if (process.env.LOAD_LOCAL_SCHEMA === 'true') {
+                            const data = fs.readFileSync(path.join(__dirname, '../../schema.json'), {
+                                encoding: 'utf-8'
+                            });
+                            // @ts-ignore
+                            this.schemaManager.setSchema(JSON.parse(data));
+                            this.setProperties();
+                            this.oldDefindexes = this.defindexes;
+                            this.oldEffects = this.schemaManager.schema.effects;
+                            this.oldPaintkits = this.schemaManager.schema.paintkits;
+                        }
+                    },
+                    1 * 60 * 1000
+                );
 
                 resolve();
             });
@@ -413,27 +417,33 @@ class WebhookQueue {
             this.isRateLimited = false;
         }
 
-        axios({
+        fetch(webhook.url, {
             method: 'POST',
-            url: webhook.url,
-            data: webhook.webhook
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(webhook.webhook)
         })
-            .then(() => {
+            .then(response => {
+                if (response.status === 429) {
+                    log.warn(`Error sending webhook on new ${webhook.type} update: Rate limited (429)`);
+                    this.sleepTime = 10000;
+                    this.isRateLimited = true;
+                    this.isProcessing = false;
+                    this.execute();
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Request failed with status code ${response.status}`);
+                }
+
                 this.isProcessing = false;
                 this.dequeue();
                 this.execute();
             })
             .catch(err => {
                 log.warn(`Error sending webhook on new ${webhook.type} update: `, err.message);
-
-                if (err.status === 429) {
-                    this.sleepTime = 10000;
-                    this.isRateLimited = true;
-
-                    this.isProcessing = false;
-                    return this.execute();
-                }
-
                 this.isProcessing = false;
                 this.dequeue();
                 this.execute();
