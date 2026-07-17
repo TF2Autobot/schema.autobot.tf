@@ -220,15 +220,13 @@ export default class SchemaManager {
                         '• ' +
                         newItemsArray
                             .map(item => {
-                                let number: string =
-                                    schemaManager.schema.raw.items_game.items[item.defindex]?.static_attrs?.[
-                                        'set supply crate series'
-                                    ];
+                                const crateSeries: number | undefined =
+                                    schemaManager.schema.crateSeriesList[item.defindex];
 
                                 return `[${item.defindex}](https://schema.autobot.tf/getItem/fromDefindex/${
                                     item.defindex
                                 }): [${item.item_name}](https://autobot.tf/items/${item.defindex};6${
-                                    number ? ';c' + number : ''
+                                    typeof crateSeries === 'number' ? ';c' + String(crateSeries) : ''
                                 })`;
                             })
                             .join('\n• '),
