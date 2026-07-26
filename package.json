@@ -25,7 +25,7 @@
     "dependencies": {
         "@fastify/swagger": "^9.8.1",
         "@fastify/swagger-ui": "^6.1.0",
-        "@tf2autobot/tf2-schema": "^4.8.0",
+        "@tf2autobot/tf2-schema": "^4.8.1",
         "@tf2autobot/tf2-sku": "^2.0.4",
         "@types/death": "^1.1.5",
         "death": "^1.1.0",
